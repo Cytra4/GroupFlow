@@ -1,3 +1,4 @@
+import GroupHeader from "@/components/GroupHeader";
 import Feather from "@expo/vector-icons/Feather";
 import { Tabs, useRouter } from "expo-router";
 import React from 'react';
@@ -17,6 +18,7 @@ export default function _layout() {
 						onPress={() => router.replace('/')}
 					/>
 				),
+				headerRight: () => <GroupHeader />,
 				tabBarItemStyle: {
 					width: "100%",
 					height: "100%",
