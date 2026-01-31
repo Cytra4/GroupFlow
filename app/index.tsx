@@ -28,7 +28,7 @@ export default function Index() {
 		order: [{ column: 'joined_at', ascending: false }],
 		filter: { 'user_id': profile?.user_id },
 	})
-	const group_ids = group_member?.map(gm => gm.group_id) ?? [];
+	const group_ids = group_member?.map(gm => (gm).group_id) ?? [];
 
 	//取得使用者在的小組資料
 	const { data: userGroups } = useFetch<Group>('groups', {
