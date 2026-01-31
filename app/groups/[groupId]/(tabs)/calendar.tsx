@@ -221,8 +221,8 @@ export default function GroupCalendar() {
 					textDayHeaderFontSize: 20,
 				}}
 
-				onDayPress={day => {
-					console.log('selected day');
+				onDayPress={date => {
+					console.log(`selected day ${date.dateString}`);
 				}}
 
 				dayComponent={({ date, onPress, state }) => {

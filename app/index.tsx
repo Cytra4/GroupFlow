@@ -20,7 +20,7 @@ export default function Index() {
 	// const { data: groups } = useFetch<Group>('groups', {
 	// 	order: [{ column: 'created_at', ascending: false }]
 	// });
-	
+
 	const router = useRouter();
 
 	//取得使用者在的小組的ID
@@ -33,7 +33,10 @@ export default function Index() {
 	//取得使用者在的小組資料
 	const { data: userGroups } = useFetch<Group>('groups', {
 		order: [{ column: 'created_at', ascending: false }],
-		filter: group_ids.length > 0 ? { 'id': group_ids } : undefined,
+		filter:
+			group_ids.length > 0
+				? { id: group_ids }
+				: { id: ['__never_match__'] },
 	});
 
 	//根據小組名稱生成header顏色
