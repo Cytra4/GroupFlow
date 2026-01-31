@@ -10,18 +10,18 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function Index() {
+    const router = useRouter();
     // const { user, setAuth } = useAuth();
 
     const signOutMutation = useSignOut();
     const profileQuery = useProfile();
     // console.log('User Profile:', profile);
 
-    const insertMutation = useInsert();
+    const groupInsertMutation = useInsert();
     // const { data: groups } = useFetch<Group>('groups', {
     // 	order: [{ column: 'created_at', ascending: false }]
     // });
 
-    const router = useRouter();
 
     //取得使用者在的小組的ID
     // const { data: group_member } = useFetch<Group_Member>('group_members', {
@@ -69,14 +69,14 @@ export default function Index() {
             <Button
                 title='Add Group'
                 onPress={() => {
-                    insertMutation.mutate({
+                    groupInsertMutation.mutate({
                         table: 'groups', row: {
                             name: `By ${profileQuery.data?.username}`,
                             created_by: profileQuery.data?.user_id
                         }
                     });
                 }}
-                loading={insertMutation.isPending}
+                loading={groupInsertMutation.isPending}
             />
 
             <FlatList

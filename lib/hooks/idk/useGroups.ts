@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useGroups(userId: string) {
 	return useQuery<Group[], Error>({
-		queryKey: ["groups", userId],
+		queryKey: ["groups"],
 		queryFn: async () => {
 			const { data, error } = await supabase
 				.from("group_members")
