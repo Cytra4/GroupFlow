@@ -34,7 +34,7 @@ export default function Forum() {
     <View style={styles.container}>
       <Text style={styles.header}>討論區</Text>
 
-      <View style={styles.newBox}>
+      <View style={styles.boxBase}>
         <TextInput
           placeholder="標題"
           value={title}
@@ -72,57 +72,87 @@ export default function Forum() {
   );
 }
 
+// 1. 定義設計規範 (Design Tokens)
+const COLORS = {
+  background: "#f2f5f8",
+  surface: "#ffffff",
+  primaryText: "#111827",
+  secondaryText: "#6b7280",
+  border: "#e2e8f0",
+  inputBg: "#f9fafb",
+  shadow: "#000",
+};
+
+const SPACING = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+};
+
+// 2. 抽離共用樣式 (Mixins)
+const commonStyles = {
+  shadow: {
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  rounded: {
+    borderRadius: 12,
+  },
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#f2f5f8", 
+    padding: SPACING.lg,
+    backgroundColor: COLORS.background,
   },
   header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1f2937", // 深色字體
-    marginBottom: 16,
+    fontSize: 26,
+    fontWeight: "800",
+    color: COLORS.primaryText,
+    marginBottom: SPACING.lg,
+    letterSpacing: -0.5,
   },
-  newBox: {
-    marginBottom: 24,
-    backgroundColor: "#ffffff",
-    padding: 12,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3, 
+
+  boxBase: {
+    ...commonStyles.shadow,
+    ...commonStyles.rounded,
+    backgroundColor: COLORS.surface,
+    padding: SPACING.md,
+    marginBottom: SPACING.xl,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#e2e8f0",
+    borderColor: COLORS.border,
     borderRadius: 10,
-    padding: 10,
-    marginBottom: 12,
-    backgroundColor: "#f9fafb",
+    padding: 12,
+    marginBottom: SPACING.md,
+    backgroundColor: COLORS.inputBg,
+    fontSize: 16,
+    color: COLORS.primaryText,
   },
   card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
+    ...commonStyles.shadow,
+    ...commonStyles.rounded,
+    backgroundColor: COLORS.surface,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
   },
   title: {
-    fontWeight: "bold",
+    fontWeight: "700",
     fontSize: 18,
-    marginBottom: 6,
-    color: "#111827",
+    marginBottom: 4,
+    color: COLORS.primaryText,
+    lineHeight: 24,
   },
   time: {
     marginTop: 8,
-    fontSize: 12,
-    color: "#6b7280", // 中灰色
+    fontSize: 13,
+    color: COLORS.secondaryText,
+    fontWeight: "500",
   },
 });
