@@ -195,7 +195,6 @@ function getWeekMaxTasks(
 	return weekMax;
 }
 
-
 export default function GroupCalendar() {
 	const { groupId } = useGlobalSearchParams<{ groupId: string }>();
 	const router = useRouter();

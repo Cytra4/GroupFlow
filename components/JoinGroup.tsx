@@ -45,7 +45,7 @@ export default function JoinGroup() {
 	return (
 		<>
 			<Feather
-				name="plus-square"
+				name="plus"
 				size={28}
 				style={{ marginRight: 16 }}
 				onPress={() => openModal()}

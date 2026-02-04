@@ -42,7 +42,6 @@ export default function Index() {
     // console.log('User Groups:', userGroups);
 
     //根據小組名稱生成header顏色
-    //(在想這東西有沒有存在的必要)
     function GenColorFromName(group_name: string) {
         let hash = 0;
         for (let i = 0; i < group_name.length; i++) {

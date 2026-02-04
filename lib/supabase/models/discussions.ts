@@ -1,16 +1,6 @@
 import { useAuth } from "@/scripts/AuthContext";
+import { Discussion } from "@/types/supabase";
 import { useFetch, useInsert } from "../query";
-
-export type Discussion = {
-  id: number;
-  group_id: string;
-  user_id: string;
-  title: string;
-  content: string;
-  status: boolean;
-  created_at: string;
-  updated_at: string;
-};
 
 export function useDiscussions(groupId: string | undefined) {
   const { data, isLoading, refetch } = useFetch<Discussion>("discussions", {

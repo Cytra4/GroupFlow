@@ -1,9 +1,123 @@
+import { GroupMember, useGroupMembers } from "@/lib/hooks/useGroupMembers";
+import { useAddNewTask } from "@/lib/supabase/models/task";
 import { wp } from "@/scripts/constants";
+import { Picker } from "@react-native-picker/picker";
+import { useGlobalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
+import { Button } from "./Button";
+import DatePicker from "./datePicker/DatePicker";
+import { Loading } from "./Loading";
 
 export default function AddTask() {
 	const [visible, setVisible] = useState(false);
+	const [taskTitle, setTaskTitle] = useState<string>("");
+	const [taskContent, setTaskContent] = useState<string>("");
+	const [startDate, setStartDate] = useState<Date>(new Date());
+	const [endDate, setEndDate] = useState<Date>(new Date());
+	const [priority, setPriority] = useState<number>(1);
+
+	const [addError, setError] = useState<string>("");
+	const [errorCode, setErrorCode] = useState<number>(0);
+	const [isSubmitting, setSubmitting] = useState<boolean>(false);
+
+	//紀錄要指派任務給哪些成員
+	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+	const { addTask } = useAddNewTask();
+
+	//取小組內的所有成員
+	const { groupId } = useGlobalSearchParams<{ groupId: string }>();
+	const {
+		data: groupMembers,
+		isLoading,
+		error,
+	} = useGroupMembers(groupId);
+
+	//處理任務的成員選取
+	const toggleMember = (userID: string) => {
+		setSelectedUserIds((prev) =>
+			prev.includes(userID)
+				? prev.filter((id) => id !== userID)
+				: [...prev, userID]
+		)
+	}
+
+	const renderMember = ({ item }: { item: GroupMember }) => {
+		const userID = item.user_id;
+		const checked = selectedUserIds.includes(userID);
+
+		return (
+			<Pressable
+				style={styles.memberRow}
+				onPress={() => toggleMember(userID)}
+			>
+				<View style={[styles.checkbox, checked && styles.checkboxChecked]}>
+					{checked && <Text style={styles.checkmark}>✓</Text>}
+				</View>
+
+				<Text style={styles.memberName}>
+					{item.profiles.username}
+				</Text>
+			</Pressable>
+		);
+	};
+
+	const errorCheck = () => {
+		if (!taskTitle) {
+			setError("請輸入任務名稱");
+			setErrorCode(1);
+			return false;
+		}
+		if (!taskContent) {
+			setError("請輸入任務內容");
+			setErrorCode(2);
+			return false;
+		}
+		if (startDate > endDate) {
+			setError("開始日期需要在結束日期之前");
+			setErrorCode(3);
+			return false;
+		}
+		if (!selectedUserIds) {
+			setError("請至少選擇一名任務成員");
+			setErrorCode(4);
+			return false;
+		}
+		setError("");
+		setErrorCode(0);
+		return true;
+	}
+
+	const dataReset = () => {
+		setTaskTitle("");
+		setTaskContent("");
+		setStartDate(new Date());
+		setEndDate(new Date());
+		setPriority(1);
+		setSelectedUserIds([]);
+		setError("");
+	}
+
+	const handleAdd = async () => {
+		if (!errorCheck()) return;
+
+		try {
+			setSubmitting(true);
+
+			await addTask(groupId, taskTitle, taskContent, priority,
+				startDate, endDate, selectedUserIds);
+
+			setVisible(false);
+			dataReset();
+		}
+		catch (err: any) {
+			setError(err.message ?? "新增任務失敗，請重新嘗試");
+		}
+		finally {
+			setSubmitting(false);
+		}
+	}
 
 	return (
 		<>
@@ -16,7 +130,7 @@ export default function AddTask() {
 						fontWeight: 'bold', marginRight: wp(3)
 					}}
 				>
-					加入任務
+					新增任務
 				</Text>
 			</Pressable>
 
@@ -30,10 +144,109 @@ export default function AddTask() {
 				<TouchableWithoutFeedback>
 					<View style={styles.centeredView}>
 						<View style={styles.modalView}>
-							<Text style={styles.modalTitle}>加入小組</Text>
-							<Pressable onPress={() => { setVisible(false)}}>
-								<Text>取消</Text>
-							</Pressable>
+							<Text style={styles.modalTitle}>新增任務</Text>
+
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務名稱</Text>
+								<TextInput
+									style={styles.input}
+									placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
+									value={taskTitle}
+									onChangeText={setTaskTitle}
+								/>
+							</View>
+
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務內容</Text>
+								<TextInput
+									style={styles.input}
+									placeholder="ex: 將程式完成並推上Github"
+									value={taskContent}
+									onChangeText={setTaskContent}
+								/>
+							</View>
+
+							<View style={styles.inputRow}>
+								<DatePicker
+									label="開始日期"
+									value={startDate}
+									onChange={setStartDate}
+									pickerStyle={styles.picker}
+								/>
+							</View>
+
+							<View style={styles.inputRow}>
+								<DatePicker
+									label="結束日期"
+									value={endDate}
+									onChange={setEndDate}
+									pickerStyle={styles.picker}
+								/>
+							</View>
+
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務優先度</Text>
+								<View style={styles.priorPicker}>
+									<Picker
+										mode="dropdown"
+										selectedValue={priority}
+										onValueChange={(itemValue, itemIndex) =>
+											setPriority(itemValue)
+										}
+									>
+										{Array.from({ length: 6 }, (_, i) => {
+											return (
+												<Picker.Item
+													key={i + 1}
+													label={(i + 1).toString()}
+													value={i + 1}
+												/>
+											);
+										})}
+									</Picker>
+								</View>
+							</View>
+
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務成員</Text>
+								{isLoading &&
+									<View>
+										<Loading />
+										<Text style={styles.loadingText}>載入成員中...</Text>
+									</View>
+								}
+
+								{error && <Text>{error.message}</Text>}
+
+								<FlatList
+									data={groupMembers}
+									keyExtractor={(item) => item.id}
+									renderItem={renderMember}
+									showsVerticalScrollIndicator={false}
+								/>
+							</View>
+
+							{addError && <Text>{addError}</Text>}
+
+							<View style={styles.buttonRow}>
+								<Button
+									buttonStyle={[styles.button, styles.cancel]}
+									textStyle={styles.buttonText}
+									title="取消"
+									onPress={() => {
+										dataReset();
+										setVisible(false);
+									}}
+								/>
+
+								<Button
+									buttonStyle={[styles.button, styles.join]}
+									textStyle={styles.buttonText}
+									title="新增"
+									onPress={handleAdd}
+									loading={isSubmitting}
+								/>
+							</View>
 						</View>
 					</View>
 				</TouchableWithoutFeedback>
@@ -51,7 +264,7 @@ const styles = StyleSheet.create({
 
 	},
 	modalView: {
-		width: "80%",
+		width: "95%",
 		backgroundColor: "white",
 		borderRadius: 16,
 		padding: 20,
@@ -65,5 +278,87 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: "bold",
 		marginBottom: 12,
-	}
+	},
+	buttonRow: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "100%",
+	},
+	button: {
+		flex: 1,
+		marginHorizontal: 5,
+		padding: 12,
+		borderRadius: 8,
+		alignItems: "center",
+	},
+	cancel: {
+		backgroundColor: "#888787ff",
+	},
+	join: {
+		backgroundColor: "coral",
+	},
+	buttonText: {
+		color: "white",
+		fontWeight: "bold",
+		fontSize: 18
+	},
+	input: {
+		width: "100%",
+		borderWidth: 1.5,
+		borderColor: "#b0b0b0",
+		borderRadius: 8,
+		padding: 10,
+	},
+	inputRow: {
+		width: "100%",
+		marginBottom: 10
+	},
+	inputTitle: {
+		fontSize: 16,
+		marginBottom: 5,
+		marginLeft: 3
+	},
+	picker: {
+		borderWidth: 2,
+		borderRadius: 1,
+		borderColor: "#b0b0b0",
+	},
+	loadingText: {
+		fontSize: 16,
+		alignSelf: 'center'
+	},
+	memberRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		paddingVertical: 8,
+	},
+	checkbox: {
+		width: 20,
+		height: 20,
+		borderWidth: 2,
+		borderColor: "#b0b0b0",
+		borderRadius: 4,
+		marginRight: 10,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	checkboxChecked: {
+		backgroundColor: "coral",
+		borderColor: "coral",
+	},
+	checkmark: {
+		color: "white",
+		fontWeight: "bold",
+	},
+	memberName: {
+		fontSize: 16,
+	},
+	priorPicker: {
+		borderWidth: 2,
+		borderRadius: 8,
+		borderColor: "#b0b0b0",
+		width: "25%",
+		justifyContent: 'center',
+		height: 40
+	},
 });
