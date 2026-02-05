@@ -52,7 +52,12 @@ export default function AddTask() {
 				style={styles.memberRow}
 				onPress={() => toggleMember(userID)}
 			>
-				<View style={[styles.checkbox, checked && styles.checkboxChecked]}>
+				<View
+					style={[styles.checkbox,
+						checked && styles.checkboxChecked,
+						(errorCode == 4 && !checked) && styles.errorInput
+					]}
+				>
 					{checked && <Text style={styles.checkmark}>✓</Text>}
 				</View>
 
@@ -79,7 +84,7 @@ export default function AddTask() {
 			setErrorCode(3);
 			return false;
 		}
-		if (!selectedUserIds) {
+		if (selectedUserIds.length === 0) {
 			setError("請至少選擇一名任務成員");
 			setErrorCode(4);
 			return false;
@@ -97,6 +102,7 @@ export default function AddTask() {
 		setPriority(1);
 		setSelectedUserIds([]);
 		setError("");
+		setErrorCode(0);
 	}
 
 	const handleAdd = async () => {
@@ -149,7 +155,7 @@ export default function AddTask() {
 							<View style={styles.inputRow}>
 								<Text style={styles.inputTitle}>任務名稱</Text>
 								<TextInput
-									style={styles.input}
+									style={[styles.input, (errorCode == 1) && styles.errorInput]}
 									placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
 									value={taskTitle}
 									onChangeText={setTaskTitle}
@@ -159,7 +165,7 @@ export default function AddTask() {
 							<View style={styles.inputRow}>
 								<Text style={styles.inputTitle}>任務內容</Text>
 								<TextInput
-									style={styles.input}
+									style={[styles.input, (errorCode == 2) && styles.errorInput]}
 									placeholder="ex: 將程式完成並推上Github"
 									value={taskContent}
 									onChangeText={setTaskContent}
@@ -171,7 +177,7 @@ export default function AddTask() {
 									label="開始日期"
 									value={startDate}
 									onChange={setStartDate}
-									pickerStyle={styles.picker}
+									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
 								/>
 							</View>
 
@@ -180,7 +186,7 @@ export default function AddTask() {
 									label="結束日期"
 									value={endDate}
 									onChange={setEndDate}
-									pickerStyle={styles.picker}
+									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
 								/>
 							</View>
 
@@ -226,7 +232,7 @@ export default function AddTask() {
 								/>
 							</View>
 
-							{addError && <Text>{addError}</Text>}
+							{addError && <Text style={styles.error}>{addError}</Text>}
 
 							<View style={styles.buttonRow}>
 								<Button
@@ -304,7 +310,7 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		width: "100%",
-		borderWidth: 1.5,
+		borderWidth: 1.8,
 		borderColor: "#b0b0b0",
 		borderRadius: 8,
 		padding: 10,
@@ -361,4 +367,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		height: 40
 	},
+	error: {
+		fontSize: 18,
+		marginBottom: 10,
+		color: 'red',
+		fontWeight: 'bold'
+	},
+	errorInput: {
+		borderColor: 'red'
+	}
 });
