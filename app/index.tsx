@@ -11,31 +11,11 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function Index() {
     const router = useRouter();
-    // const { user, setAuth } = useAuth();
 
     const signOutMutation = useSignOut();
     const profileQuery = useProfile();
-    // console.log('User Profile:', profile);
-
+    
     const groupInsertMutation = useInsert();
-    // const { data: groups } = useFetch<Group>('groups', {
-    // 	order: [{ column: 'created_at', ascending: false }]
-    // });
-
-
-    //取得使用者在的小組的ID
-    // const { data: group_member } = useFetch<Group_Member>('group_members', {
-    //     order: [{ column: 'joined_at', ascending: false }],
-    //     filter: { 'user_id': profile?.user_id },
-    // });
-
-    // const group_ids = group_member?.map(gm => gm.group_id) ?? [];
-
-    //取得使用者在的小組資料
-    // const { data: userGroups } = useFetch<Group>('groups', {
-    //     order: [{ column: 'created_at', ascending: false }],
-    //     filter: group_ids.length > 0 ? { 'id': group_ids } : undefined,
-    // });
 
     const { data: userGroups } = useGroups(profileQuery.data?.user_id || '');
 

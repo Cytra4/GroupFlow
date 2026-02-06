@@ -22,6 +22,18 @@ export type Group_Member = {
 	joined_at: Date;
 }
 
+export type Task = {
+	id: number;
+	title: string;
+	description: string;
+	status: string;
+	priority: number;
+	start_date: string;
+	due_date: string;
+	created_by: string;
+	updated_at: string;
+}
+
 export type Discussion = {
   id: number;
   group_id: string;

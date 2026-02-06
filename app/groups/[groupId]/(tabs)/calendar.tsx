@@ -1,6 +1,9 @@
 import CustomDay from '@/components/calendar/CustomDay';
-import { useGlobalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { Loading } from '@/components/Loading';
+import { useTask } from '@/lib/hooks/useTask';
+import { Task } from '@/types/supabase';
+import { useGlobalSearchParams } from 'expo-router';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CalendarList, LocaleConfig } from 'react-native-calendars';
 
@@ -17,77 +20,8 @@ LocaleConfig.locales['ch'] = {
 
 LocaleConfig.defaultLocale = 'ch';
 
-//*測試時間表用
-export type Group_Task = {
-	id: string;
-	group_id: string;
-	title: string;
-	description: string;
-	priority: number;
-	start_date: Date;
-	due_date: Date;
-}
-
-//測試用資料
-const test_tasks: Group_Task[] = [
-	{
-		id: 'task-1',
-		group_id: 'group-1',
-		title: 'AAAAA',
-		description: '成員 A 的任務',
-		priority: 1,
-		start_date: new Date('2026-01-10'),
-		due_date: new Date('2026-01-12'),
-	},
-	{
-		id: 'task-2',
-		group_id: 'group-1',
-		title: 'BBBB',
-		description: '成員 B 的長任務',
-		priority: 2,
-		start_date: new Date('2026-01-11'),
-		due_date: new Date('2026-01-18'),
-	},
-	{
-		id: 'task-3',
-		group_id: 'group-1',
-		title: 'CCCCC',
-		priority: 3,
-		description: '成員 C 的任務',
-		start_date: new Date('2026-01-19'),
-		due_date: new Date('2026-01-27'),
-	},
-	{
-		id: 'task-4',
-		group_id: 'group-1',
-		title: 'DDDDD',
-		priority: 4,
-		description: '成員 D 的任務',
-		start_date: new Date('2026-01-11'),
-		due_date: new Date('2026-01-15'),
-	},
-	{
-		id: 'task-5',
-		group_id: 'group-1',
-		title: 'EEEEE',
-		priority: 5,
-		description: '成員 E 的任務',
-		start_date: new Date('2026-01-20'),
-		due_date: new Date('2026-01-22'),
-	},
-	{
-		id: 'task-6',
-		group_id: 'group-1',
-		title: 'FFFFF',
-		priority: 6,
-		description: '成員 F 的任務',
-		start_date: new Date('2026-01-12'),
-		due_date: new Date('2026-01-15'),
-	},
-];
-
 export type TaskRenderInfo = {
-	task: Group_Task;
+	task: Task;
 	isStart: boolean;
 	isEnd: boolean;
 	rowIndex: number;
@@ -105,66 +39,65 @@ const addDays = (date: Date, days: number) => {
 
 //確保任務不會在顯示上被覆蓋
 function findAvailableRow(
-  start: Date,
-  end: Date,
-  dayRowUsage: Record<string, Set<number>>,
+	start: Date,
+	end: Date,
+	dayRowUsage: Record<string, Set<number>>,
 ): number {
-  let row = 0;
+	let row = 0;
 
-  while (true) {
-    let conflict = false;
-    let current = new Date(start);
+	while (true) {
+		let conflict = false;
+		let current = new Date(start);
 
-    while (current <= end) {
-      const key = formatDate(current);
-      if (dayRowUsage[key]?.has(row)) {
-        conflict = true;
-        break;
-      }
-      current = addDays(current, 1);
-    }
+		while (current <= end) {
+			const key = formatDate(current);
+			if (dayRowUsage[key]?.has(row)) {
+				conflict = true;
+				break;
+			}
+			current = addDays(current, 1);
+		}
 
-    if (!conflict) return row;
-    row++;
-  }
+		if (!conflict) return row;
+		row++;
+	}
 }
 
 // 取得每天有哪些任務
 export function GetTasksForEachDay(
-  tasks: Group_Task[],
+	tasks: Task[],
 ): Record<string, TaskRenderInfo[]> {
-  const result: Record<string, TaskRenderInfo[]> = {};
-  const dayRowUsage: Record<string, Set<number>> = {};
+	const result: Record<string, TaskRenderInfo[]> = {};
+	const dayRowUsage: Record<string, Set<number>> = {};
 
-  for (const task of tasks) {
-    const start = new Date(task.start_date);
-    const end = new Date(task.due_date);
+	for (const task of tasks) {
+		const start = new Date(task.start_date);
+		const end = new Date(task.due_date);
 
-    const rowIndex = findAvailableRow(start, end, dayRowUsage);
+		const rowIndex = findAvailableRow(start, end, dayRowUsage);
 
-    let current = new Date(start);
-    while (current <= end) {
-      const dateKey = formatDate(current);
+		let current = new Date(start);
+		while (current <= end) {
+			const dateKey = formatDate(current);
 
-      if (!result[dateKey]) result[dateKey] = [];
-      if (!dayRowUsage[dateKey]) dayRowUsage[dateKey] = new Set();
+			if (!result[dateKey]) result[dateKey] = [];
+			if (!dayRowUsage[dateKey]) dayRowUsage[dateKey] = new Set();
 
-      dayRowUsage[dateKey].add(rowIndex);
+			dayRowUsage[dateKey].add(rowIndex);
 
-      result[dateKey].push({
-        task,
-        rowIndex,
-        isStart: formatDate(current) === formatDate(start),
-        isEnd: formatDate(current) === formatDate(end),
-      });
+			result[dateKey].push({
+				task,
+				rowIndex,
+				isStart: formatDate(current) === formatDate(start),
+				isEnd: formatDate(current) === formatDate(end),
+			});
 
-      current = addDays(current, 1);
-    }
-  }
+			current = addDays(current, 1);
+		}
+	}
 
-  return result;
+	return result;
 }
-
 
 function getWeekKey(dateString: string) {
 	const d = new Date(dateString);
@@ -172,7 +105,6 @@ function getWeekKey(dateString: string) {
 	sunday.setDate(d.getDate() - d.getDay()); // 週日
 	return formatDate(sunday);
 }
-
 
 // 計算每周最大任務數量
 function getWeekMaxTasks(
@@ -197,14 +129,17 @@ function getWeekMaxTasks(
 
 export default function GroupCalendar() {
 	const { groupId } = useGlobalSearchParams<{ groupId: string }>();
-	const router = useRouter();
 
-	const currentYear = new Date().getFullYear();
-	const currentMonth = new Date().getMonth();
-	const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-	const [selectedMonth, setSelectedMonth] = useState<number>(currentMonth + 1);
+	//取得任務資料
+	const {
+		data: groupTasks,
+		isLoading,
+		error,
+	} = useTask(groupId || "");
 
-	const taskEachDay = GetTasksForEachDay(test_tasks);
+	if (isLoading) return <Loading />
+
+	const taskEachDay = GetTasksForEachDay(groupTasks ?? []);
 	const weekMaxTasks = getWeekMaxTasks(taskEachDay);
 
 	return (

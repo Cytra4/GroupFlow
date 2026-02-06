@@ -1,8 +1,10 @@
 import { useAuth } from "@/scripts/AuthContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../client";
 
 export function useAddNewTask() {
 	const { user } = useAuth();
+	const queryClient = useQueryClient();
 
 	const addTask = async (
 		groupID: string,
@@ -29,8 +31,9 @@ export function useAddNewTask() {
 			.from("task")
 			.insert({
 				title,
+				group_id: groupID,
 				description,
-				status : taskStatus,
+				status: taskStatus,
 				priority,
 				start_date: startDate.toISOString(),
 				due_date: dueDate.toISOString(),
@@ -55,6 +58,11 @@ export function useAddNewTask() {
 
 			if (error) throw error;
 		}
+
+		queryClient.invalidateQueries({
+			queryKey: ["task", groupID],
+		});
+
 		return task;
 	};
 
