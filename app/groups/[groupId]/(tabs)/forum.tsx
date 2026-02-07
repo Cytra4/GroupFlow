@@ -1,3 +1,4 @@
+import { useAddComment, useComments } from "@/lib/supabase/models/comments";
 import {
 	Discussion,
 	useAddDiscussion,
@@ -21,6 +22,7 @@ export default function Forum() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [openDiscussionId, setOpenDiscussionId] = useState<number | null>(null);
 
   const handleAdd = () => {
     if (!title || !content || !groupId) return;
@@ -58,13 +60,15 @@ export default function Forum() {
           data={discussions}
           keyExtractor={(item: Discussion) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text>{item.content}</Text>
-              <Text style={styles.time}>
-                {new Date(item.created_at).toLocaleString()}
-              </Text>
-            </View>
+            <DiscussionCard
+              discussion={item}
+              isOpen={openDiscussionId === item.id}
+              onToggle={() =>
+                setOpenDiscussionId(
+                  openDiscussionId === item.id ? null : item.id,
+                )
+              }
+            />
           )}
         />
       )}
@@ -72,7 +76,90 @@ export default function Forum() {
   );
 }
 
-// 1. 定義設計規範 (Design Tokens)
+// 子元件：每個討論卡片 + 回覆區
+function DiscussionCard({
+  discussion,
+  isOpen,
+  onToggle,
+}: {
+  discussion: Discussion;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const { comments, refetch } = useComments(discussion.id);
+  const { addComment } = useAddComment();
+  const [replyText, setReplyText] = useState("");
+
+  const handleAddReply = () => {
+    if (!replyText.trim()) return;
+    addComment(discussion.id, replyText);
+    setReplyText("");
+    refetch();
+  };
+
+  return (
+    <View style={styles.card}>
+      <Text onPress={onToggle} style={styles.title}>
+        {discussion.title}
+      </Text>
+      <Text>{discussion.content}</Text>
+
+      <View
+        style={{
+          marginTop: 8,
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={{ fontSize: 12, color: "#6b7280" }}>
+          {discussion.profiles?.username ?? "匿名"}
+        </Text>
+        <Text style={styles.time}>
+          {new Date(discussion.created_at).toLocaleString()}
+        </Text>
+      </View>
+
+      {isOpen && (
+        <View
+          style={{
+            marginTop: 12,
+            borderTopWidth: 1,
+            borderColor: "#eee",
+            paddingTop: 8,
+          }}
+        >
+          {comments.map((c) => (
+            <View key={c.id} style={{ marginBottom: 8 }}>
+              <Text style={{ fontSize: 12, fontWeight: "bold" }}>
+                {c.profiles?.username ?? "匿名"}
+              </Text>
+              <Text>{c.content}</Text>
+              <Text style={{ fontSize: 10, color: "#888" }}>
+                {new Date(c.created_at).toLocaleString()}
+              </Text>
+            </View>
+          ))}
+
+          <TextInput
+            value={replyText}
+            onChangeText={setReplyText}
+            placeholder="輸入回覆..."
+            style={{
+              borderWidth: 1,
+              borderColor: "#ccc",
+              borderRadius: 6,
+              padding: 6,
+              marginTop: 8,
+            }}
+          />
+          <Button title="送出回覆" onPress={handleAddReply} />
+        </View>
+      )}
+    </View>
+  );
+}
+
+// --- 你原本的樣式保留 ---
 const COLORS = {
   background: "#f2f5f8",
   surface: "#ffffff",
@@ -90,7 +177,6 @@ const SPACING = {
   xl: 24,
 };
 
-// 2. 抽離共用樣式 (Mixins)
 const commonStyles = {
   shadow: {
     shadowColor: COLORS.shadow,
