@@ -1,5 +1,5 @@
 import { TaskRenderInfo } from "@/app/groups/[groupId]/(tabs)/calendar";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { DateData } from "react-native-calendars";
 import { DayState } from "react-native-calendars/src/types";
 
@@ -54,9 +54,9 @@ export default function CustomDay(
 	const plusN = Math.max(0, maxUsedRow - MAX_VISIBLE);
 
 	return (
-		<Pressable onPress={onDayPress} style={styles.container}>
+		<View style={styles.container}>
 			{/* 日期 */}
-			<View>
+			<TouchableOpacity onPress={onDayPress}>
 				<Text style={[styles.dayText,
 				dayState == 'today' ?
 					{ color: '#F63049', fontWeight: 'bold' }
@@ -64,7 +64,7 @@ export default function CustomDay(
 				>
 					{date?.day}
 				</Text>
-			</View>
+			</TouchableOpacity>
 
 			{/* 顯示任務 */}
 			{visibleTasks.map((t, i) => {
@@ -101,7 +101,7 @@ export default function CustomDay(
 					<Text>+{plusN}</Text>
 				</View>
 			)}
-		</Pressable>
+		</View>
 	);
 }
 
@@ -140,5 +140,5 @@ const styles = StyleSheet.create({
 	plusText: {
 		fontSize: 13,
 		alignSelf: "center"
-	}
+	},
 })

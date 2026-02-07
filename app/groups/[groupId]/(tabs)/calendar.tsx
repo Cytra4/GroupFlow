@@ -24,7 +24,7 @@ export type TaskRenderInfo = {
 	task: Task;
 	isStart: boolean;
 	isEnd: boolean;
-	rowIndex: number;
+	rowIndex?: number;
 };
 
 const formatDate = (date: Date) => {
@@ -37,57 +37,24 @@ const addDays = (date: Date, days: number) => {
 	return d;
 };
 
-//確保任務不會在顯示上被覆蓋
-function findAvailableRow(
-	start: Date,
-	end: Date,
-	dayRowUsage: Record<string, Set<number>>,
-): number {
-	let row = 0;
-
-	while (true) {
-		let conflict = false;
-		let current = new Date(start);
-
-		while (current <= end) {
-			const key = formatDate(current);
-			if (dayRowUsage[key]?.has(row)) {
-				conflict = true;
-				break;
-			}
-			current = addDays(current, 1);
-		}
-
-		if (!conflict) return row;
-		row++;
-	}
-}
-
 // 取得每天有哪些任務
 export function GetTasksForEachDay(
 	tasks: Task[],
 ): Record<string, TaskRenderInfo[]> {
 	const result: Record<string, TaskRenderInfo[]> = {};
-	const dayRowUsage: Record<string, Set<number>> = {};
 
 	for (const task of tasks) {
 		const start = new Date(task.start_date);
 		const end = new Date(task.due_date);
-
-		const rowIndex = findAvailableRow(start, end, dayRowUsage);
 
 		let current = new Date(start);
 		while (current <= end) {
 			const dateKey = formatDate(current);
 
 			if (!result[dateKey]) result[dateKey] = [];
-			if (!dayRowUsage[dateKey]) dayRowUsage[dateKey] = new Set();
-
-			dayRowUsage[dateKey].add(rowIndex);
 
 			result[dateKey].push({
 				task,
-				rowIndex,
 				isStart: formatDate(current) === formatDate(start),
 				isEnd: formatDate(current) === formatDate(end),
 			});
@@ -99,32 +66,12 @@ export function GetTasksForEachDay(
 	return result;
 }
 
+
 function getWeekKey(dateString: string) {
 	const d = new Date(dateString);
 	const sunday = new Date(d);
 	sunday.setDate(d.getDate() - d.getDay()); // 週日
 	return formatDate(sunday);
-}
-
-// 計算每周最大任務數量
-function getWeekMaxTasks(
-	tasksByDate: Record<string, TaskRenderInfo[]>
-) {
-	const weekMax: Record<string, number> = {};
-
-	for (const date in tasksByDate) {
-		const weekKey = getWeekKey(date);
-
-		for (const t of tasksByDate[date]) {
-			const neededRows = t.rowIndex + 1;
-			weekMax[weekKey] = Math.max(
-				weekMax[weekKey] || 0,
-				neededRows
-			);
-		}
-	}
-
-	return weekMax;
 }
 
 export default function GroupCalendar() {
@@ -140,7 +87,6 @@ export default function GroupCalendar() {
 	if (isLoading) return <Loading />
 
 	const taskEachDay = GetTasksForEachDay(groupTasks ?? []);
-	const weekMaxTasks = getWeekMaxTasks(taskEachDay);
 
 	return (
 		<View style={styles.container}>
@@ -160,20 +106,47 @@ export default function GroupCalendar() {
 				}}
 
 				dayComponent={({ date, onPress, state }) => {
-					const dateString = date?.dateString ? date?.dateString : ""
+					const dateString = date?.dateString ?? "";
 					const weekKey = getWeekKey(dateString);
-					const rows = weekMaxTasks[weekKey];
+
+					// 今天的任務
+					const todayTasks = taskEachDay[dateString] ?? [];
+
+					// 本週所有任務（去重）
+					const weekTasks = Object.entries(taskEachDay)
+						.filter(([d]) => getWeekKey(d) === weekKey)
+						.flatMap(([, tasks]) => tasks)
+						.map(t => t.task)
+						.filter(
+							(task, idx, arr) =>
+								arr.findIndex(t => t.id === task.id) === idx
+						);
+
+					// 本週 row 分配
+					const rowMap = new Map<number, number>();
+					let nextRow = 0;
+
+					weekTasks.forEach(task => {
+						rowMap.set(task.id, nextRow++);
+					});
+
+					// 今天要 render 的 tasks（帶 rowIndex）
+					const tasksWithRow = todayTasks.map(t => ({
+						...t,
+						rowIndex: rowMap.get(t.task.id)!,
+					}));
 
 					return (
 						<CustomDay
 							date={date}
 							onDayPress={onPress}
-							tasks={taskEachDay[dateString] ?? []}
-							maxRows={rows ?? 0}
+							tasks={tasksWithRow}
+							maxRows={weekTasks.length}
 							dayState={state}
 						/>
-					)
+					);
 				}}
+
 			/>
 		</View>
 	)
