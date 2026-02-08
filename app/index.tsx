@@ -59,6 +59,7 @@ export default function Index() {
             />
 
             <FlatList
+				showsVerticalScrollIndicator={false}
                 data={userGroups}
                 style={{ width: wp(80) }}
                 keyExtractor={(group) => group.id}
@@ -70,7 +71,7 @@ export default function Index() {
                         headerColor={GenColorFromName(item.name)}
                         onPress={() => {
                             router.replace({
-                                pathname: '/groups/[groupId]/calendar',
+                                pathname: `/groups/[groupId]/calendar`,
                                 params: { groupId: item.id },
                             });
                         }

@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
 		width: '100%'
 	},
 	dayText: {
-		fontSize: 18,
+		fontSize: 20,
 		marginBottom: 8,
 		alignSelf: "center"
 	},

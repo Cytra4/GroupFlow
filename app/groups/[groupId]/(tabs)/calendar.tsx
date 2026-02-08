@@ -2,7 +2,7 @@ import CustomDay from '@/components/calendar/CustomDay';
 import { Loading } from '@/components/Loading';
 import { useTask } from '@/lib/hooks/useTask';
 import { Task } from '@/types/supabase';
-import { useGlobalSearchParams } from 'expo-router';
+import { useGlobalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CalendarList, LocaleConfig } from 'react-native-calendars';
@@ -76,6 +76,7 @@ function getWeekKey(dateString: string) {
 
 export default function GroupCalendar() {
 	const { groupId } = useGlobalSearchParams<{ groupId: string }>();
+	const router = useRouter();
 
 	//取得任務資料
 	const {
@@ -95,24 +96,17 @@ export default function GroupCalendar() {
 				pastScrollRange={12}
 				futureScrollRange={12}
 				monthFormat={'yyyy年 M月'}
-				enableSwipeMonths={true}
 				theme={{
 					textMonthFontSize: 18,
 					textDayHeaderFontSize: 20,
-				}}
-
-				onDayPress={date => {
-					console.log(`selected day ${date.dateString}`);
 				}}
 
 				dayComponent={({ date, onPress, state }) => {
 					const dateString = date?.dateString ?? "";
 					const weekKey = getWeekKey(dateString);
 
-					// 今天的任務
 					const todayTasks = taskEachDay[dateString] ?? [];
 
-					// 本週所有任務（去重）
 					const weekTasks = Object.entries(taskEachDay)
 						.filter(([d]) => getWeekKey(d) === weekKey)
 						.flatMap(([, tasks]) => tasks)
@@ -122,7 +116,6 @@ export default function GroupCalendar() {
 								arr.findIndex(t => t.id === task.id) === idx
 						);
 
-					// 本週 row 分配
 					const rowMap = new Map<number, number>();
 					let nextRow = 0;
 
@@ -130,7 +123,6 @@ export default function GroupCalendar() {
 						rowMap.set(task.id, nextRow++);
 					});
 
-					// 今天要 render 的 tasks（帶 rowIndex）
 					const tasksWithRow = todayTasks.map(t => ({
 						...t,
 						rowIndex: rowMap.get(t.task.id)!,
@@ -139,14 +131,18 @@ export default function GroupCalendar() {
 					return (
 						<CustomDay
 							date={date}
-							onDayPress={onPress}
+							onDayPress={() => {
+								router.replace({
+									pathname: '/groups/[groupId]/dayDetail/[date]',
+									params: {groupId, date: dateString}
+								})
+							}}
 							tasks={tasksWithRow}
 							maxRows={weekTasks.length}
 							dayState={state}
 						/>
 					);
 				}}
-
 			/>
 		</View>
 	)
@@ -157,7 +153,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	calendar: {
-		height: "100%",
 		width: "100%"
 	}
 })
