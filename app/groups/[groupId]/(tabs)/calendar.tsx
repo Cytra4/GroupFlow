@@ -85,7 +85,11 @@ export default function GroupCalendar() {
 		error,
 	} = useTask(groupId || "");
 
-	if (isLoading) return <Loading />
+	if (isLoading) return (
+		<View style={styles.container}>
+			<Loading size={'large'}/>
+		</View>
+	)
 
 	const taskEachDay = GetTasksForEachDay(groupTasks ?? []);
 
