@@ -8,6 +8,22 @@ import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWitho
 import { Button } from "./Button";
 import DatePicker from "./datePicker/DatePicker";
 import { Loading } from "./Loading";
+import { PressableOpacity } from "./PressableOpacity";
+
+function GetPriorityLabel(prior: number){
+	switch(prior){
+		case 1:
+			return "高度優先";
+		case 2:
+			return "中高度優先";
+		case 3:
+			return "中度優先";
+		case 4:
+			return "中低度優先";
+		default:
+			return "低度優先";
+	}
+}
 
 export default function AddTask() {
 	const [visible, setVisible] = useState(false);
@@ -54,8 +70,8 @@ export default function AddTask() {
 			>
 				<View
 					style={[styles.checkbox,
-						checked && styles.checkboxChecked,
-						(errorCode == 4 && !checked) && styles.errorInput
+					checked && styles.checkboxChecked,
+					(errorCode == 4 && !checked) && styles.errorInput
 					]}
 				>
 					{checked && <Text style={styles.checkmark}>✓</Text>}
@@ -127,7 +143,7 @@ export default function AddTask() {
 
 	return (
 		<>
-			<Pressable
+			<PressableOpacity
 				onPress={() => setVisible(true)}
 			>
 				<Text
@@ -138,7 +154,7 @@ export default function AddTask() {
 				>
 					新增任務
 				</Text>
-			</Pressable>
+			</PressableOpacity>
 
 			<Modal
 				transparent
@@ -147,113 +163,120 @@ export default function AddTask() {
 				onRequestClose={() => setVisible(false)}
 				statusBarTranslucent
 			>
-				<TouchableWithoutFeedback>
+				<TouchableWithoutFeedback
+					onPress={() => {
+						dataReset();
+						setVisible(false);
+					}}
+				>
 					<View style={styles.centeredView}>
-						<View style={styles.modalView}>
-							<Text style={styles.modalTitle}>新增任務</Text>
+						<TouchableWithoutFeedback>
+							<View style={styles.modalView}>
+								<Text style={styles.modalTitle}>新增任務</Text>
 
-							<View style={styles.inputRow}>
-								<Text style={styles.inputTitle}>任務名稱</Text>
-								<TextInput
-									style={[styles.input, (errorCode == 1) && styles.errorInput]}
-									placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
-									value={taskTitle}
-									onChangeText={setTaskTitle}
-								/>
-							</View>
+								<View style={styles.inputRow}>
+									<Text style={styles.inputTitle}>任務名稱</Text>
+									<TextInput
+										style={[styles.input, (errorCode == 1) && styles.errorInput]}
+										placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
+										value={taskTitle}
+										onChangeText={setTaskTitle}
+									/>
+								</View>
 
-							<View style={styles.inputRow}>
-								<Text style={styles.inputTitle}>任務內容</Text>
-								<TextInput
-									style={[styles.input, (errorCode == 2) && styles.errorInput]}
-									placeholder="ex: 將程式完成並推上Github"
-									value={taskContent}
-									onChangeText={setTaskContent}
-								/>
-							</View>
+								<View style={styles.inputRow}>
+									<Text style={styles.inputTitle}>任務內容</Text>
+									<TextInput
+										style={[styles.input, (errorCode == 2) && styles.errorInput]}
+										placeholder="ex: 將程式完成並推上Github"
+										value={taskContent}
+										onChangeText={setTaskContent}
+									/>
+								</View>
 
-							<View style={styles.inputRow}>
-								<DatePicker
-									label="開始日期"
-									value={startDate}
-									onChange={setStartDate}
-									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
-								/>
-							</View>
+								<View style={styles.inputRow}>
+									<DatePicker
+										label="開始日期"
+										value={startDate}
+										onChange={setStartDate}
+										pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
+									/>
+								</View>
 
-							<View style={styles.inputRow}>
-								<DatePicker
-									label="結束日期"
-									value={endDate}
-									onChange={setEndDate}
-									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
-								/>
-							</View>
+								<View style={styles.inputRow}>
+									<DatePicker
+										label="結束日期"
+										value={endDate}
+										onChange={setEndDate}
+										pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
+									/>
+								</View>
 
-							<View style={styles.inputRow}>
-								<Text style={styles.inputTitle}>任務優先度</Text>
-								<View style={styles.priorPicker}>
-									<Picker
-										mode="dropdown"
-										selectedValue={priority}
-										onValueChange={(itemValue, itemIndex) =>
-											setPriority(itemValue)
-										}
-									>
-										{Array.from({ length: 6 }, (_, i) => {
-											return (
-												<Picker.Item
-													key={i + 1}
-													label={(i + 1).toString()}
-													value={i + 1}
-												/>
-											);
-										})}
-									</Picker>
+								<View style={styles.inputRow}>
+									<Text style={styles.inputTitle}>任務優先度</Text>
+									<View style={styles.priorPicker}>
+										<Picker
+											mode="dropdown"
+											selectedValue={priority}
+											onValueChange={(itemValue, itemIndex) =>
+												setPriority(itemValue)
+											}
+										>
+											{Array.from({ length: 5 }, (_, i) => {
+												return (
+													<Picker.Item
+														key={i + 1}
+														label={`${(i + 1).toString()} (${GetPriorityLabel(i+1)})`}
+														value={i + 1}
+													/>
+												);
+											})}
+										</Picker>
+									</View>
+								</View>
+
+								<View style={styles.inputRow}>
+									<Text style={styles.inputTitle}>任務成員</Text>
+									{isLoading &&
+										<View>
+											<Loading />
+											<Text style={styles.loadingText}>載入成員中...</Text>
+										</View>
+									}
+
+									{error && <Text>{error.message}</Text>}
+
+									<FlatList
+										data={groupMembers}
+										keyExtractor={(item) => item.id}
+										renderItem={renderMember}
+										showsVerticalScrollIndicator={false}
+									/>
+								</View>
+
+								{addError && <Text style={styles.error}>{addError}</Text>}
+
+								<View style={styles.buttonRow}>
+									<Button
+										buttonStyle={[styles.button, styles.cancel]}
+										textStyle={styles.buttonText}
+										title="取消"
+										onPress={() => {
+											dataReset();
+											setVisible(false);
+										}}
+									/>
+
+									<Button
+										buttonStyle={[styles.button, styles.join]}
+										textStyle={styles.buttonText}
+										title="新增"
+										onPress={handleAdd}
+										loading={isSubmitting}
+									/>
 								</View>
 							</View>
-
-							<View style={styles.inputRow}>
-								<Text style={styles.inputTitle}>任務成員</Text>
-								{isLoading &&
-									<View>
-										<Loading />
-										<Text style={styles.loadingText}>載入成員中...</Text>
-									</View>
-								}
-
-								{error && <Text>{error.message}</Text>}
-
-								<FlatList
-									data={groupMembers}
-									keyExtractor={(item) => item.id}
-									renderItem={renderMember}
-									showsVerticalScrollIndicator={false}
-								/>
-							</View>
-
-							{addError && <Text style={styles.error}>{addError}</Text>}
-
-							<View style={styles.buttonRow}>
-								<Button
-									buttonStyle={[styles.button, styles.cancel]}
-									textStyle={styles.buttonText}
-									title="取消"
-									onPress={() => {
-										dataReset();
-										setVisible(false);
-									}}
-								/>
-
-								<Button
-									buttonStyle={[styles.button, styles.join]}
-									textStyle={styles.buttonText}
-									title="新增"
-									onPress={handleAdd}
-									loading={isSubmitting}
-								/>
-							</View>
-						</View>
+						</TouchableWithoutFeedback>
 					</View>
 				</TouchableWithoutFeedback>
 			</Modal>
@@ -267,7 +290,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "rgba(0,0,0,0.3)",
-
 	},
 	modalView: {
 		width: "95%",
@@ -363,7 +385,7 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderRadius: 8,
 		borderColor: "#b0b0b0",
-		width: "25%",
+		width: "50%",
 		justifyContent: 'center',
 		height: 40
 	},

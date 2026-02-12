@@ -1,7 +1,8 @@
+import { PressableOpacity } from '@/components/PressableOpacity';
 import Feather from '@expo/vector-icons/Feather';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, TouchableOpacity } from 'react-native';
+import { Pressable } from 'react-native';
 
 export default function GroupLayout() {
 	const router = useRouter();
@@ -36,7 +37,7 @@ export default function GroupLayout() {
 					headerTitle: '當天任務',
 					headerTitleAlign: 'center',
 					headerLeft: () => (
-						<TouchableOpacity
+						<PressableOpacity
 							onPress={() => router.replace({
 								pathname: `/groups/[groupId]/calendar`,
 								params: { groupId },
@@ -46,7 +47,7 @@ export default function GroupLayout() {
 								name="arrow-left"
 								size={24}
 							/>
-						</TouchableOpacity>
+						</PressableOpacity>
 					)
 				}}
 			/>

@@ -1,7 +1,8 @@
 import { TaskRenderInfo } from "@/app/groups/[groupId]/(tabs)/calendar";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { DateData } from "react-native-calendars";
 import { DayState } from "react-native-calendars/src/types";
+import { PressableOpacity } from "../PressableOpacity";
 
 //最大顯示任務數量
 const MAX_VISIBLE = 3;
@@ -9,11 +10,11 @@ const MAX_VISIBLE = 3;
 function chooseBarStyle(task: TaskRenderInfo) {
 	const colors = [
 		'#F63049', '#FF7444', '#FAB95B',
-		'#08CB00', '#008BFF', '#8B5CF6'
+		'#08CB00', '#008BFF'
 	];
 
 	return {
-		backgroundColor: colors[task.task.priority - 1] ?? colors[5],
+		backgroundColor: colors[task.task.priority - 1] ?? colors[4],
 		borderTopLeftRadius: task.isStart ? 6 : 0,
 		borderBottomLeftRadius: task.isStart ? 6 : 0,
 		borderTopRightRadius: task.isEnd ? 6 : 0,
@@ -56,7 +57,7 @@ export default function CustomDay(
 	return (
 		<View style={styles.container}>
 			{/* 日期 */}
-			<TouchableOpacity onPress={onDayPress}>
+			<PressableOpacity onPress={onDayPress}>
 				<Text style={[styles.dayText,
 				dayState == 'today' ?
 					{ color: '#F63049', fontWeight: 'bold' }
@@ -64,7 +65,7 @@ export default function CustomDay(
 				>
 					{date?.day}
 				</Text>
-			</TouchableOpacity>
+			</PressableOpacity>
 
 			{/* 顯示任務 */}
 			{visibleTasks.map((t, i) => {

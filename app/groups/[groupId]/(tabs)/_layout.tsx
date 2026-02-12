@@ -1,8 +1,8 @@
 import GroupHeader from "@/components/GroupHeader";
+import { PressableOpacity } from "@/components/PressableOpacity";
 import Feather from "@expo/vector-icons/Feather";
 import { Tabs, useRouter } from "expo-router";
 import React from 'react';
-import { TouchableOpacity } from "react-native";
 
 export default function _layout() {
 	const router = useRouter();
@@ -12,7 +12,7 @@ export default function _layout() {
 			screenOptions={{
 				headerTitleAlign: "center",
 				headerLeft: () => (
-					<TouchableOpacity
+					<PressableOpacity
 						onPress={() => router.replace('/')}
 					>
 						<Feather
@@ -20,7 +20,7 @@ export default function _layout() {
 							size={24}
 							style={{ marginLeft: 16 }}
 						/>
-					</TouchableOpacity>
+					</PressableOpacity>
 				),
 				headerRight: () => <GroupHeader />,
 				tabBarItemStyle: {
