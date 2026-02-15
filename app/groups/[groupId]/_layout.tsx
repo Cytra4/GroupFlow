@@ -34,7 +34,7 @@ export default function GroupLayout() {
 			<Stack.Screen
 				name="dayDetail/[date]"
 				options={{
-					headerTitle: '當天任務',
+					headerTitle: '今天的任務',
 					headerTitleAlign: 'center',
 					headerLeft: () => (
 						<PressableOpacity

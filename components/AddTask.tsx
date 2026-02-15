@@ -59,6 +59,8 @@ export default function AddTask() {
 		)
 	}
 
+	//TO BE DONE
+	//* 這邊之後除了名稱以外應該也要加上成員頭像
 	const renderMember = ({ item }: { item: GroupMember }) => {
 		const userID = item.user_id;
 		const checked = selectedUserIds.includes(userID);
@@ -392,10 +394,10 @@ const styles = StyleSheet.create({
 	error: {
 		fontSize: 18,
 		marginBottom: 10,
-		color: 'red',
+		color: "#E43636",
 		fontWeight: 'bold'
 	},
 	errorInput: {
-		borderColor: 'red'
+		borderColor: "#E43636"
 	}
 });

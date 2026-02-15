@@ -58,34 +58,38 @@ export default function JoinGroup() {
 				onRequestClose={() => setVisible(false)}
 				statusBarTranslucent
 			>
-				<TouchableWithoutFeedback>
+				<TouchableWithoutFeedback
+					onPress={() => setVisible(false)}
+				>
 					<View style={styles.centeredView}>
-						<View style={styles.modalView}>
-							<Text style={styles.modalTitle}>加入小組</Text>
+						<TouchableWithoutFeedback>
+							<View style={styles.modalView}>
+								<Text style={styles.modalTitle}>加入小組</Text>
 
-							<TextInput
-								style={[styles.input, error ? styles.errorInput : {}]}
-								placeholder="請輸入小組代碼"
-								value={code}
-								onChangeText={setCode}
-							/>
+								<TextInput
+									style={[styles.input, error ? styles.errorInput : {}]}
+									placeholder="請輸入小組代碼"
+									value={code}
+									onChangeText={setCode}
+								/>
 
-							{error ? <Text style={styles.error}>{error}</Text> : null}
+								{error ? <Text style={styles.error}>{error}</Text> : null}
 
-							<View style={styles.buttonRow}>
-								<Pressable style={[styles.button, styles.cancel]} onPress={() => setVisible(false)}>
-									<Text style={styles.buttonText}>取消</Text>
-								</Pressable>
+								<View style={styles.buttonRow}>
+									<Pressable style={[styles.button, styles.cancel]} onPress={() => setVisible(false)}>
+										<Text style={styles.buttonText}>取消</Text>
+									</Pressable>
 
-								<Pressable
-									style={[styles.button, styles.join]}
-									onPress={handleJoin}
-									disabled={joinGroupMutation.isPending}
-								>
-									<Text style={styles.buttonText}>加入</Text>
-								</Pressable>
+									<Pressable
+										style={[styles.button, styles.join]}
+										onPress={handleJoin}
+										disabled={joinGroupMutation.isPending}
+									>
+										<Text style={styles.buttonText}>加入</Text>
+									</Pressable>
+								</View>
 							</View>
-						</View>
+						</TouchableWithoutFeedback>
 					</View>
 				</TouchableWithoutFeedback>
 			</Modal>
@@ -119,7 +123,7 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		width: "100%",
-		borderWidth: 1.5,
+		borderWidth: 2,
 		borderColor: "#ccc",
 		borderRadius: 8,
 		padding: 10,

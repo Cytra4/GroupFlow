@@ -52,7 +52,7 @@ export default function Login() {
 					<CustomInput
 						placeholder="信箱"
 						onChange={setEmail}
-						boxStyle={{ marginBottom: 30 }}
+						boxStyle={[{ marginBottom: 30 }, error && { borderColor: "#E43636" }]}
 						iconName='mail'
 						keyboardType='email-address'
 					/>
@@ -60,7 +60,7 @@ export default function Login() {
 					<CustomInput
 						placeholder="密碼"
 						onChange={setPassword}
-						boxStyle={{}}
+						boxStyle={[error && { borderColor: "#E43636" }]}
 						iconName="lock"
 						secureText={true}
 					/>
@@ -121,7 +121,8 @@ const styles = StyleSheet.create({
 		marginBottom: 20
 	},
 	error: {
-		color: "red",
+		color: "#E43636",
+		fontWeight: "bold",
 		fontSize: 18,
 		marginTop: 5
 	}

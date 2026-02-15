@@ -74,6 +74,7 @@ export default function TaskDetail(
 								/>
 								<IconRow
 									icon={"flag-outline"}
+									iconColor={iconColor}
 									info={`${GetPriorityLabel(taskData?.priority ?? 0)}任務`}
 									iconSize={25}
 								/>
@@ -82,6 +83,8 @@ export default function TaskDetail(
 
 								<Text style={styles.sectionTitle}>任務成員</Text>
 
+								{/* TO BE DONE */}
+								{/* 這邊可能之後得改成使用FlatList，然後要加上頭像 */}
 								{membersData?.map((member, index) => {
 									return (
 										<Text key={index} style={styles.memberName}>

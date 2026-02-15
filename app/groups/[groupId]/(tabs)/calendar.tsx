@@ -86,7 +86,7 @@ export default function GroupCalendar() {
 	} = useTask(groupId || "");
 
 	if (isLoading) return (
-		<View style={styles.container}>
+		<View style={[styles.container,{justifyContent: 'center', alignItems: 'center'}]}>
 			<Loading size={'large'}/>
 		</View>
 	)
