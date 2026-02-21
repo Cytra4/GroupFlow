@@ -25,6 +25,11 @@ function GetDateRange(start_date: string, due_date: string){
 	return result;
 }
 
+//TO BE DONE
+//*TaskCard需要再做修改，應有兩種模式:
+// 1. View only，當這個任務非使用者所參與的任務時，只供使用者瀏覽任務資訊
+// 2. Editable，當這個任務為使用者所參與的任務時，提供使用者編輯任務及其他功能
+
 export default function TaskCard({ taskData }: { taskData: Task }) {
 	return (
 		<View style={[styles.container, {borderColor: getPriorityColor(taskData.priority)}]}>

@@ -46,19 +46,6 @@ export default function Index() {
                 登出
             </Text>
 
-            {/* <Button
-                title='Add Group'
-                onPress={() => {
-                    groupInsertMutation.mutate({
-                        table: 'groups', row: {
-                            name: `By ${profileQuery.data?.username}`,
-                            created_by: profileQuery.data?.user_id
-                        }
-                    });
-                }}
-                loading={groupInsertMutation.isPending}
-            /> */}
-
 			<CreateGroup />
 
             <FlatList
