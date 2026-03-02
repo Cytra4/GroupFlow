@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase/client";
 import { useAddComment, useComments } from "@/lib/supabase/models/comments";
 import {
 	Discussion,
@@ -5,7 +6,7 @@ import {
 	useDiscussions,
 } from "@/lib/supabase/models/discussions";
 import { useGlobalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	FlatList,
@@ -76,7 +77,6 @@ export default function Forum() {
   );
 }
 
-// 子元件：每個討論卡片 + 回覆區
 function DiscussionCard({
   discussion,
   isOpen,
@@ -89,6 +89,27 @@ function DiscussionCard({
   const { comments, refetch } = useComments(discussion.id);
   const { addComment } = useAddComment();
   const [replyText, setReplyText] = useState("");
+  useEffect(() => {
+    const channel = supabase
+      .channel(`comments-${discussion.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "comments",
+          filter: `discussion_id=eq.${discussion.id}`,
+        },
+        () => {
+          refetch(); 
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [discussion.id]);
 
   const handleAddReply = () => {
     if (!replyText.trim()) return;
@@ -99,9 +120,7 @@ function DiscussionCard({
 
   return (
     <View style={styles.card}>
-      <Text onPress={onToggle} style={styles.title}>
-        {discussion.title}
-      </Text>
+      <Text style={styles.title}>{discussion.title}</Text>
       <Text>{discussion.content}</Text>
 
       <View
@@ -119,6 +138,20 @@ function DiscussionCard({
         </Text>
       </View>
 
+      <View style={{ alignItems: "flex-end", marginTop: 6 }}>
+        <Text
+          onPress={onToggle}
+          style={{
+            color: "#4f46e5",
+            fontWeight: "600",
+            fontSize: 14,
+          }}
+        >
+          {isOpen ? "收合回覆" : "回覆"}
+        </Text>
+      </View>
+
+      {/* reply */}
       {isOpen && (
         <View
           style={{
@@ -152,6 +185,7 @@ function DiscussionCard({
               marginTop: 8,
             }}
           />
+
           <Button title="送出回覆" onPress={handleAddReply} />
         </View>
       )}
