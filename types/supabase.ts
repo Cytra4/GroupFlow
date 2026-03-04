@@ -48,10 +48,11 @@ export type Task = {
 export type Discussion = {
   id: number;
   group_id: string;
-  user_id: string;
   title: string;
   content: string;
   status: boolean;
   created_at: string;
-  updated_at: string;
+  profiles?: {
+    username: string | null;
+  };
 };

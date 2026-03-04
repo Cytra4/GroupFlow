@@ -1,10 +1,10 @@
 import { supabase } from "@/lib/supabase/client";
 import { useAddComment, useComments } from "@/lib/supabase/models/comments";
 import {
-	Discussion,
 	useAddDiscussion,
 	useDiscussions,
 } from "@/lib/supabase/models/discussions";
+import { Discussion } from "@/types/supabase";
 import { useGlobalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -23,6 +23,7 @@ export default function Forum() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [showForm, setShowForm] = useState(false);
   const [openDiscussionId, setOpenDiscussionId] = useState<number | null>(null);
 
   const handleAdd = () => {
@@ -35,25 +36,61 @@ export default function Forum() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>討論區</Text>
+      {!showForm && (
+        <View style={{ alignItems: "flex-end", marginBottom: 16 }}>
+          <Text
+            onPress={() => setShowForm(true)}
+            style={{
+              backgroundColor: "#4f46e5",
+              color: "#fff",
+              paddingVertical: 8,
+              paddingHorizontal: 16,
+              borderRadius: 20,
+              fontWeight: "600",
+            }}
+          >
+            + 新增討論
+          </Text>
+        </View>
+      )}
+      {showForm && (
+        <View style={styles.boxBase}>
+          <TextInput
+            placeholder="標題"
+            value={title}
+            onChangeText={setTitle}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="內容"
+            value={content}
+            onChangeText={setContent}
+            style={[styles.input, { height: 80 }]}
+            multiline
+          />
 
-      <View style={styles.boxBase}>
-        <TextInput
-          placeholder="標題"
-          value={title}
-          onChangeText={setTitle}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="內容"
-          value={content}
-          onChangeText={setContent}
-          style={[styles.input, { height: 80 }]}
-          multiline
-        />
-        <Button title="新增討論" onPress={handleAdd} disabled={isPending} />
-      </View>
-
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Button
+              title="取消"
+              onPress={() => {
+                setShowForm(false);
+                setTitle("");
+                setContent("");
+              }}
+            />
+            <Button
+              title="送出"
+              onPress={() => {
+                handleAdd();
+                setShowForm(false);
+              }}
+              disabled={isPending}
+            />
+          </View>
+        </View>
+      )}
       {isLoading ? (
         <Text>載入中...</Text>
       ) : (
@@ -87,6 +124,7 @@ function DiscussionCard({
   onToggle: () => void;
 }) {
   const { comments, refetch } = useComments(discussion.id);
+
   const { addComment } = useAddComment();
   const [replyText, setReplyText] = useState("");
   useEffect(() => {
@@ -101,7 +139,7 @@ function DiscussionCard({
           filter: `discussion_id=eq.${discussion.id}`,
         },
         () => {
-          refetch(); 
+          refetch();
         },
       )
       .subscribe();
@@ -137,7 +175,6 @@ function DiscussionCard({
           {new Date(discussion.created_at).toLocaleString()}
         </Text>
       </View>
-
       <View style={{ alignItems: "flex-end", marginTop: 6 }}>
         <Text
           onPress={onToggle}
@@ -147,7 +184,7 @@ function DiscussionCard({
             fontSize: 14,
           }}
         >
-          {isOpen ? "收合回覆" : "回覆"}
+          {isOpen ? "收合回覆" : `${comments?.length ?? 0} 則回覆`}
         </Text>
       </View>
 
@@ -167,7 +204,7 @@ function DiscussionCard({
                 {c.profiles?.username ?? "匿名"}
               </Text>
               <Text>{c.content}</Text>
-              <Text style={{ fontSize: 10, color: "#888" }}>
+              <Text style={{ fontSize: 10, color: "#8d5353" }}>
                 {new Date(c.created_at).toLocaleString()}
               </Text>
             </View>
@@ -195,11 +232,11 @@ function DiscussionCard({
 
 // --- 你原本的樣式保留 ---
 const COLORS = {
-  background: "#f2f5f8",
+  background: "#cfd7db",
   surface: "#ffffff",
   primaryText: "#111827",
   secondaryText: "#6b7280",
-  border: "#e2e8f0",
+  border: "#141f94",
   inputBg: "#f9fafb",
   shadow: "#000",
 };
@@ -232,7 +269,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 26,
-    fontWeight: "800",
+    fontWeight: "400",
     color: COLORS.primaryText,
     marginBottom: SPACING.lg,
     letterSpacing: -0.5,
@@ -263,7 +300,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   title: {
-    fontWeight: "700",
+    fontWeight: "400",
     fontSize: 18,
     marginBottom: 4,
     color: COLORS.primaryText,
