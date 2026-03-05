@@ -38,7 +38,7 @@ export default function TaskDetail(
 	return (
 		<>
 			<PressableOpacity
-				PressStyle={iconStyle}
+				PressStyle={[styles.iconButton,iconStyle]}
 				onPress={() => setVisible(true)}
 			>
 				<Ionicons name="information-circle-outline" size={iconSize ?? 30} color={iconColor ?? "blue"} />
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
 		fontSize: 16
 	},
 	button: {
-		marginHorizontal: 10,
+		marginHorizontal: 8,
 		marginTop: 50,
 		paddingHorizontal: 30,
 		borderRadius: 8,
@@ -159,5 +159,9 @@ const styles = StyleSheet.create({
 	},
 	memberName: {
 		fontSize: 16
+	},
+	iconButton: {
+		alignItems: "center",
+		justifyContent: "center",
 	}
 })

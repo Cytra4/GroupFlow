@@ -44,6 +44,13 @@ const styles = StyleSheet.create({
 		padding: 14,
 		borderWidth: 2,
 		borderRadius: 40,
+		backgroundColor: '#fff',
+
+		shadowColor: "#000",
+		shadowOpacity: 0.6,
+		shadowRadius: 40,
+		shadowOffset: { width: 1, height: 4 },
+		elevation: 6,
 	},
 	title: {
 		fontSize: 24,
@@ -52,11 +59,13 @@ const styles = StyleSheet.create({
 		marginLeft: wp(2)
 	},
 	content: {
+		marginTop: 12,
 		padding: 12,
 		gap: 10,
 	},
 	line: {
 		borderTopWidth: 2,
-		marginTop: 16
+		marginTop: 16,
+		borderStyle: 'solid',
 	}
 })

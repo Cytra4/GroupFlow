@@ -17,86 +17,137 @@ function getPriorityColor(priority: number) {
 	}
 }
 
-function GetDateRange(start_date: string, due_date: string){
-	let s = start_date.replaceAll("-","/");
-	let d = due_date.replaceAll("-","/");
-	let result = "";
-	result = s + " ~ " + d;
-	return result;
+function GetDateRange(start_date: string, due_date: string) {
+	const s = start_date.replaceAll("-", "/");
+	const d = due_date.replaceAll("-", "/");
+	return `${s} ~ ${d}`;
 }
 
-//TO BE DONE
-//*TaskCard需要再做修改，應有兩種模式:
-// 1. View only，當這個任務非使用者所參與的任務時，只供使用者瀏覽任務資訊
-// 2. Editable，當這個任務為使用者所參與的任務時，提供使用者編輯任務及其他功能
+export default function TaskCard({
+	taskData,
+	mode = "ViewOnly",
+}: {
+	taskData: Task;
+	mode?: "ViewOnly" | "Editable";
+}) {
 
-export default function TaskCard({ taskData }: { taskData: Task }) {
+	const priorityColor = getPriorityColor(taskData.priority);
+	const dateRange = GetDateRange(taskData.start_date, taskData.due_date);
+	const isEditable = mode === "Editable";
+
 	return (
-		<View style={[styles.container, {borderColor: getPriorityColor(taskData.priority)}]}>
-			<View
-				style={[
-					styles.priorityBar,
-					{ backgroundColor: getPriorityColor(taskData.priority) },
-				]}
-			/>
+		<View
+			style={[
+				styles.container,
+				{
+					borderColor: priorityColor,
+					flexDirection: "column",
+					borderRadius: isEditable ? 0 : 16
+				},
+				isEditable && {borderColor: "#eee"}
+			]}
+		>
+			<View style={styles.row}>
+				<View
+					style={[
+						styles.priorityBar,
+						{ backgroundColor: priorityColor },
+					]}
+				/>
 
-			<View style={styles.content}>
-				<Text style={styles.title}>{taskData.title}</Text>
-				<Text style={styles.date}>
-					{GetDateRange(taskData.start_date, taskData.due_date)}
-				</Text>
+				<View style={styles.content}>
+					<Text style={styles.title}>{taskData.title}</Text>
+					<Text style={styles.date}>{dateRange}</Text>
+				</View>
+
+				{!isEditable && (
+					<TaskDetail
+						iconColor={priorityColor}
+						taskData={taskData}
+						time={dateRange}
+					/>
+				)}
 			</View>
-			
-			<TaskDetail
-				iconColor={getPriorityColor(taskData.priority)}
-				taskData={taskData}
-				time={GetDateRange(taskData.start_date, taskData.due_date)}
-			/>
+
+			{/* 我發現Icon底下一直會多一個空格，但是我的CSS技術差到找不到解決方法
+			所以我先放了個marginBottom: -10來逃避現實 */}
+			{isEditable && (
+				<>
+					<View style={styles.iconTabs}>
+						<TaskDetail
+							iconColor={priorityColor}
+							iconStyle={{marginBottom: -10}}
+							taskData={taskData}
+							time={dateRange}
+						/>
+						<TaskDetail
+							iconColor={priorityColor}
+							iconStyle={{marginBottom: -10}}
+							taskData={taskData}
+							time={dateRange}
+						/>
+						<TaskDetail
+							iconColor={priorityColor}
+							iconStyle={{marginBottom: -10}}
+							taskData={taskData}
+							time={dateRange}
+						/>
+					</View>
+				</>
+			)}
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
-		flexDirection: "row",
-		alignItems: "center",
 		backgroundColor: "#fff",
-		borderColor: "#eee",
-		borderWidth: 1.5,
-		borderRadius: 16,
+		borderWidth: 2.5,
 		paddingVertical: 20,
-		paddingRight: 16,
+		paddingHorizontal: 16,
 		marginBottom: 16,
 
 		shadowColor: "#000",
 		shadowOpacity: 0.1,
 		shadowRadius: 6,
 		shadowOffset: { width: 1, height: 4 },
-		elevation: 4
+		elevation: 4,
 	},
+
+	row: {
+		flexDirection: "row",
+		alignItems: "center",
+	},
+
 	priorityBar: {
 		width: 12,
 		height: "100%",
 		borderRadius: 16,
-		marginLeft: 18,
-		marginRight: 18
+		marginLeft: 5,
+		marginRight: 18,
 	},
+
 	content: {
 		flex: 1,
 		gap: 6,
 	},
+
 	title: {
 		fontSize: 18,
 		fontWeight: "600",
 		color: "#111",
 	},
+
 	date: {
 		fontSize: 15,
 		color: "#666",
 	},
-	action: {
-		paddingLeft: 8,
-		justifyContent: "center",
-		alignItems: "center",
+
+	iconTabs: {
+		flexDirection: "row",
+		alignItems: 'center',
+		justifyContent: "space-between",
+		paddingTop: 12,
+		paddingHorizontal: 10
 	},
 });
