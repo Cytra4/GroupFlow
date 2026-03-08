@@ -1,6 +1,6 @@
 import TaskSection from '@/components/mission/TaskSection';
 import TaskCard from '@/components/TaskCard';
-import { useTask } from '@/lib/hooks/useTask';
+import { useUserTasks } from '@/lib/hooks/useTask';
 import { useGlobalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -24,7 +24,7 @@ export default function Mission() {
 		}));
 	}
 
-	const taskData = useTask(groupId)["data"];
+	const taskData = useUserTasks(groupId)["data"];
 	const todoTasks = taskData?.filter((task) => task["status"] == "未開始");
 	const ongoingTasks = taskData?.filter((task) => task["status"] == "進行中");
 	const endTasks = taskData?.filter((task) => task["status"] == "已結束");

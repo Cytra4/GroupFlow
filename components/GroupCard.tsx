@@ -52,11 +52,12 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		marginVertical: 12,
 		width: "100%",
+
 		shadowColor: '#000',
 		shadowOpacity: 0.1,
 		shadowRadius: 6,
 		shadowOffset: { width: 0, height: 3 },
-		elevation: 3,
+		elevation: 5,
 		overflow: "hidden",
 	},
 	header: {

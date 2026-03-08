@@ -1,6 +1,7 @@
 import { Task } from "@/types/supabase";
 import { StyleSheet, Text, View } from "react-native";
 import TaskDetail from "./TaskDetail";
+import TaskEdit from "./mission/TaskEdit";
 
 function getPriorityColor(priority: number) {
 	switch (priority) {
@@ -86,11 +87,10 @@ export default function TaskCard({
 							taskData={taskData}
 							time={dateRange}
 						/>
-						<TaskDetail
+						<TaskEdit
 							iconColor={priorityColor}
 							iconStyle={{marginBottom: -10}}
 							taskData={taskData}
-							time={dateRange}
 						/>
 					</View>
 				</>

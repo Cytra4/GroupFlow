@@ -47,10 +47,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 
 		shadowColor: "#000",
-		shadowOpacity: 0.6,
-		shadowRadius: 40,
-		shadowOffset: { width: 1, height: 4 },
-		elevation: 6,
+		shadowOpacity: 0.2,
+		shadowRadius: 5,
+		shadowOffset: { width: 1, height: 2 },
+		elevation: 2,
 	},
 	title: {
 		fontSize: 24,

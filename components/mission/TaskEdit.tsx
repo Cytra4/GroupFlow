@@ -1,17 +1,19 @@
 import { GroupMember, useGroupMembers } from "@/lib/hooks/useGroupMembers";
-import { useAddNewTask } from "@/lib/supabase/models/task";
-import { wp } from "@/scripts/constants";
+import { useTaskMembers } from "@/lib/hooks/useTaskMembers";
+import { useUpdateTask, useUpdateTaskMembers } from "@/lib/hooks/useUpdateTask";
+import { Task } from "@/types/supabase";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useGlobalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
-import { Button } from "./Button";
-import DatePicker from "./datePicker/DatePicker";
-import { Loading } from "./Loading";
-import { PressableOpacity } from "./PressableOpacity";
+import { Button } from "../Button";
+import { Loading } from "../Loading";
+import { PressableOpacity } from "../PressableOpacity";
+import DatePicker from "../datePicker/DatePicker";
 
-function GetPriorityLabel(prior: number){
-	switch(prior){
+function GetPriorityLabel(prior: number) {
+	switch (prior) {
 		case 1:
 			return "高度優先";
 		case 2:
@@ -25,24 +27,35 @@ function GetPriorityLabel(prior: number){
 	}
 }
 
-export default function AddTask() {
-	const [visible, setVisible] = useState(false);
-	const [taskTitle, setTaskTitle] = useState<string>("");
-	const [taskContent, setTaskContent] = useState<string>("");
-	const [startDate, setStartDate] = useState<Date>(new Date());
-	const [endDate, setEndDate] = useState<Date>(new Date());
-	const [priority, setPriority] = useState<number>(1);
+export default function TaskEdit(
+	{ iconColor, iconSize, iconStyle, taskData }
+		:
+		{
+			iconColor?: string, iconSize?: number,
+			iconStyle?: object, taskData?: Task,
+		}
+) {
+
+	const [visible, setVisible] = useState<boolean>(false);
+
+	const [taskTitle, setTaskTitle] = useState<string>(taskData?.title ?? "");
+	const [taskContent, setTaskContent] = useState<string>(taskData?.description ?? "");
+	const [startDate, setStartDate] = useState<Date>(
+		taskData?.start_date ?
+			new Date(taskData?.start_date) :
+			new Date()
+	);
+	const [endDate, setEndDate] = useState<Date>(
+		taskData?.due_date ?
+			new Date(taskData?.due_date) :
+			new Date()
+	);
+	const [priority, setPriority] = useState<number>(taskData?.priority ?? 1);
 
 	const [addError, setError] = useState<string>("");
 	const [errorCode, setErrorCode] = useState<number>(0);
 	const [isSubmitting, setSubmitting] = useState<boolean>(false);
 
-	//紀錄要指派任務給哪些成員
-	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-
-	const { addTask } = useAddNewTask();
-
-	//取小組內的所有成員
 	const { groupId } = useGlobalSearchParams<{ groupId: string }>();
 	const {
 		data: groupMembers,
@@ -50,7 +63,6 @@ export default function AddTask() {
 		error,
 	} = useGroupMembers(groupId);
 
-	//處理任務的成員選取
 	const toggleMember = (userID: string) => {
 		setSelectedUserIds((prev) =>
 			prev.includes(userID)
@@ -58,6 +70,17 @@ export default function AddTask() {
 				: [...prev, userID]
 		)
 	}
+
+	//取得原本有參與任務的成員
+	const { data: taskMembersData } = useTaskMembers(taskData?.id ?? 0);
+
+	const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+
+	useEffect(() => {
+		if (taskMembersData) {
+			setSelectedUserIds(taskMembersData.map(m => m.user_id));
+		}
+	}, [taskMembersData]);
 
 	//TO BE DONE
 	//* 這邊之後除了名稱以外應該也要加上成員頭像
@@ -86,6 +109,9 @@ export default function AddTask() {
 		);
 	};
 
+	const { mutateAsync: updateTask } = useUpdateTask();
+	const { mutateAsync: updateTaskMembers } = useUpdateTaskMembers();
+
 	const errorCheck = () => {
 		if (!taskTitle) {
 			setError("請輸入任務名稱");
@@ -112,31 +138,34 @@ export default function AddTask() {
 		return true;
 	}
 
-	const dataReset = () => {
-		setTaskTitle("");
-		setTaskContent("");
-		setStartDate(new Date());
-		setEndDate(new Date());
-		setPriority(1);
-		setSelectedUserIds([]);
-		setError("");
-		setErrorCode(0);
-	}
-
-	const handleAdd = async () => {
+	const handleUpdate = async () => {
 		if (!errorCheck()) return;
+		if (!taskData) return;
 
 		try {
 			setSubmitting(true);
 
-			await addTask(groupId, taskTitle, taskContent, priority,
-				startDate, endDate, selectedUserIds);
+			await updateTask({
+				taskId: taskData?.id,
+				groupId: groupId,
+				taskTitle,
+				taskContent,
+				startDate,
+				endDate,
+				priority
+			});
+
+			await updateTaskMembers({
+				taskId: taskData!.id,
+				groupId: groupId,
+				newUserIds: selectedUserIds,
+				currentUserIds: taskMembersData?.map(m => m.user_id) ?? []
+			});
 
 			setVisible(false);
-			dataReset();
 		}
 		catch (err: any) {
-			setError(err.message ?? "新增任務失敗，請重新嘗試");
+			setError(err.message ?? "更新任務失敗，請重新嘗試");
 		}
 		finally {
 			setSubmitting(false);
@@ -146,16 +175,10 @@ export default function AddTask() {
 	return (
 		<>
 			<PressableOpacity
+				PressStyle={[styles.iconButton, iconStyle]}
 				onPress={() => setVisible(true)}
 			>
-				<Text
-					style={{
-						fontSize: 20, color: 'coral',
-						fontWeight: 'bold', marginRight: wp(3)
-					}}
-				>
-					新增任務
-				</Text>
+				<Ionicons name="settings-outline" size={iconSize ?? 30} color={iconColor ?? "blue"} />
 			</PressableOpacity>
 
 			<Modal
@@ -166,15 +189,12 @@ export default function AddTask() {
 				statusBarTranslucent
 			>
 				<TouchableWithoutFeedback
-					onPress={() => {
-						dataReset();
-						setVisible(false);
-					}}
+					onPress={() => setVisible(false)}
 				>
 					<View style={styles.centeredView}>
 						<TouchableWithoutFeedback>
-							<View style={styles.modalView}>
-								<Text style={styles.modalTitle}>新增任務</Text>
+							<View style={[styles.modalView, { borderWidth: 3.5, borderColor: iconColor ?? "blue" }]}>
+								<Text style={styles.title}>修改任務</Text>
 
 								<View style={styles.inputRow}>
 									<Text style={styles.inputTitle}>任務名稱</Text>
@@ -228,7 +248,7 @@ export default function AddTask() {
 												return (
 													<Picker.Item
 														key={i + 1}
-														label={`${(i + 1).toString()} (${GetPriorityLabel(i+1)})`}
+														label={`${(i + 1).toString()} (${GetPriorityLabel(i + 1)})`}
 														value={i + 1}
 													/>
 												);
@@ -262,17 +282,26 @@ export default function AddTask() {
 									<Button
 										buttonStyle={[styles.button, styles.join]}
 										textStyle={styles.buttonText}
-										title="新增"
-										onPress={handleAdd}
+										title="更新任務"
+										onPress={handleUpdate}
 										loading={isSubmitting}
 									/>
-									
+
+									{/* HAVENT DONE YET */}
+									<Button
+										buttonStyle={[styles.button, styles.delete]}
+										textStyle={styles.buttonText}
+										title="刪除任務"
+										onPress={() => {
+											setVisible(false);
+										}}
+									/>
+
 									<Button
 										buttonStyle={[styles.button, styles.cancel]}
 										textStyle={styles.buttonText}
 										title="取消"
 										onPress={() => {
-											dataReset();
 											setVisible(false);
 										}}
 									/>
@@ -289,9 +318,9 @@ export default function AddTask() {
 const styles = StyleSheet.create({
 	centeredView: {
 		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		backgroundColor: "rgba(0,0,0,0.3)",
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0,0,0,0.3)'
 	},
 	modalView: {
 		width: "95%",
@@ -304,7 +333,11 @@ const styles = StyleSheet.create({
 		shadowRadius: 4,
 		elevation: 5,
 	},
-	modalTitle: {
+	iconButton: {
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	title: {
 		fontSize: 18,
 		fontWeight: "bold",
 		marginBottom: 12,
@@ -326,6 +359,9 @@ const styles = StyleSheet.create({
 	},
 	join: {
 		backgroundColor: "coral",
+	},
+	delete: {
+		backgroundColor: '#F63049'
 	},
 	buttonText: {
 		color: "white",
@@ -400,4 +436,4 @@ const styles = StyleSheet.create({
 	errorInput: {
 		borderColor: "#E43636"
 	}
-});
+})

@@ -76,16 +76,16 @@ export default function JoinGroup() {
 								{error ? <Text style={styles.error}>{error}</Text> : null}
 
 								<View style={styles.buttonRow}>
-									<Pressable style={[styles.button, styles.cancel]} onPress={() => setVisible(false)}>
-										<Text style={styles.buttonText}>取消</Text>
-									</Pressable>
-
 									<Pressable
 										style={[styles.button, styles.join]}
 										onPress={handleJoin}
 										disabled={joinGroupMutation.isPending}
 									>
 										<Text style={styles.buttonText}>加入</Text>
+									</Pressable>
+									
+									<Pressable style={[styles.button, styles.cancel]} onPress={() => setVisible(false)}>
+										<Text style={styles.buttonText}>取消</Text>
 									</Pressable>
 								</View>
 							</View>

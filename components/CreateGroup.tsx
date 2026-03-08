@@ -80,6 +80,14 @@ export default function CreateGroup() {
 
 								<View style={{ flexDirection: 'row' }}>
 									<Button
+										title="建立"
+										buttonStyle={[styles.modalButton, styles.createButton]}
+										textStyle={styles.buttonText}
+										onPress={HandleJoin}
+										loading={loading}
+									/>
+									
+									<Button
 										title="取消"
 										buttonStyle={[styles.modalButton, styles.cancelButton]}
 										textStyle={styles.buttonText}
@@ -88,13 +96,6 @@ export default function CreateGroup() {
 											setError("");
 											setVisible(false);
 										}}
-									/>
-									<Button
-										title="建立"
-										buttonStyle={[styles.modalButton, styles.createButton]}
-										textStyle={styles.buttonText}
-										onPress={HandleJoin}
-										loading={loading}
 									/>
 								</View>
 							</View>
