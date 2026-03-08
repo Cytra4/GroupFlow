@@ -201,6 +201,7 @@ export default function TaskEdit(
 									<TextInput
 										style={[styles.input, (errorCode == 1) && styles.errorInput]}
 										placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
+										placeholderTextColor={"#939393"}
 										value={taskTitle}
 										onChangeText={setTaskTitle}
 									/>
@@ -211,6 +212,7 @@ export default function TaskEdit(
 									<TextInput
 										style={[styles.input, (errorCode == 2) && styles.errorInput]}
 										placeholder="ex: 將程式完成並推上Github"
+										placeholderTextColor={"#939393"}
 										value={taskContent}
 										onChangeText={setTaskContent}
 									/>

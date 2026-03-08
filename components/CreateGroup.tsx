@@ -70,6 +70,7 @@ export default function CreateGroup() {
 								<TextInput
 									style={[styles.input, error && {borderColor: "#E43636"}]}
 									placeholder="請輸入小組名稱"
+									placeholderTextColor={"#939393"}
 									value={groupName}
 									onChangeText={setGroupName}
 								/>

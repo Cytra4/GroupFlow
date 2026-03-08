@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
 		elevation: 2,
 	},
 	title: {
-		fontSize: 24,
+		fontSize: 22,
 		fontWeight: 'bold',
 		marginRight: wp(40),
 		marginLeft: wp(2)

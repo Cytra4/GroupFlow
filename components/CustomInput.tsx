@@ -43,6 +43,7 @@ export default function CustomInput({
 			)}
 			<TextInput
 				placeholder={placeholder}
+				placeholderTextColor={"#939393"}
 				style={[styles.text, textStyle]}
 				onChangeText={onChange}
 				keyboardType={keyboardType}
