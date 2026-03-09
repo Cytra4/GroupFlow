@@ -1,10 +1,10 @@
 import { GroupMember, useGroupMembers } from "@/lib/hooks/useGroupMembers";
 import { useAddNewTask } from "@/lib/supabase/models/task";
 import { wp } from "@/scripts/constants";
-import { Picker } from "@react-native-picker/picker";
 import { useGlobalSearchParams } from "expo-router";
 import { useState } from "react";
 import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
+import RNPickerSelect from 'react-native-picker-select';
 import { Button } from "./Button";
 import DatePicker from "./datePicker/DatePicker";
 import { Loading } from "./Loading";
@@ -219,23 +219,30 @@ export default function AddTask() {
 								<View style={styles.inputRow}>
 									<Text style={styles.inputTitle}>任務優先度</Text>
 									<View style={styles.priorPicker}>
-										<Picker
-											mode="dropdown"
-											selectedValue={priority}
+										<RNPickerSelect
 											onValueChange={(itemValue, itemIndex) =>
 												setPriority(itemValue)
 											}
-										>
-											{Array.from({ length: 5 }, (_, i) => {
-												return (
-													<Picker.Item
-														key={i + 1}
-														label={`${(i + 1).toString()} (${GetPriorityLabel(i+1)})`}
-														value={i + 1}
-													/>
-												);
-											})}
-										</Picker>
+											placeholder={{}}
+											items={[
+												{ label: '1 (高度優先)', value: 1 },
+												{ label: '2 (中高度優先)', value: 2 },
+												{ label: '3 (中度優先)', value: 3 },
+												{ label: '4 (中低度優先)', value: 4 },
+												{ label: '5 (低度優先)', value: 5 },
+											]}
+											style={{
+												inputIOS: styles.pickerInputIOS,
+												inputIOSContainer: {
+													zIndex: 100,
+												},
+											}}
+											pickerProps={{
+												itemStyle: {
+													color: 'black'
+												}
+											}}
+										/>
 									</View>
 								</View>
 
@@ -401,5 +408,10 @@ const styles = StyleSheet.create({
 	},
 	errorInput: {
 		borderColor: "#E43636"
+	},
+	pickerInputIOS: {
+		textAlign: 'center',
+		justifyContent: 'center',
+		alignContent: 'center',
 	}
 });

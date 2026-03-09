@@ -1,31 +1,18 @@
+import { useDeleteTask } from "@/lib/hooks/useDeleteTask";
 import { GroupMember, useGroupMembers } from "@/lib/hooks/useGroupMembers";
 import { useTaskMembers } from "@/lib/hooks/useTaskMembers";
 import { useUpdateTask, useUpdateTaskMembers } from "@/lib/hooks/useUpdateTask";
+import { wp } from "@/scripts/constants";
 import { Task } from "@/types/supabase";
 import { Ionicons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
 import { useGlobalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, FlatList, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
+import RNPickerSelect from 'react-native-picker-select';
 import { Button } from "../Button";
 import { Loading } from "../Loading";
 import { PressableOpacity } from "../PressableOpacity";
 import DatePicker from "../datePicker/DatePicker";
-
-function GetPriorityLabel(prior: number) {
-	switch (prior) {
-		case 1:
-			return "高度優先";
-		case 2:
-			return "中高度優先";
-		case 3:
-			return "中度優先";
-		case 4:
-			return "中低度優先";
-		default:
-			return "低度優先";
-	}
-}
 
 export default function TaskEdit(
 	{ iconColor, iconSize, iconStyle, taskData }
@@ -55,6 +42,7 @@ export default function TaskEdit(
 	const [addError, setError] = useState<string>("");
 	const [errorCode, setErrorCode] = useState<number>(0);
 	const [isSubmitting, setSubmitting] = useState<boolean>(false);
+	const [isDeleting, setDeleting] = useState<boolean>(false);
 
 	const { groupId } = useGlobalSearchParams<{ groupId: string }>();
 	const {
@@ -172,6 +160,47 @@ export default function TaskEdit(
 		}
 	}
 
+	const { mutateAsync: deleteTask } = useDeleteTask();
+
+	const handleDeleteTask = async () => {
+		if (!taskData) return;
+
+		try{
+			setDeleting(true)
+
+			await deleteTask({
+				taskId: taskData.id,
+				groupId: groupId
+			})
+
+			setVisible(false)
+		}
+		catch(err: any){
+			setError(err.message ?? "刪除失敗，請稍後再重新嘗試")
+		}
+		finally{
+			setDeleting(false)
+		}
+	}
+
+	const handleDeleteConfirm = () => {
+		Alert.alert(
+			"刪除任務",
+			"確定要刪除任務嗎？ 此操作將無法復原",
+			[
+				{
+					text: "確認",
+					style: "destructive",
+					onPress: handleDeleteTask 
+				},
+				{
+					text: "取消",
+					style: "cancel"
+				}
+			]
+		)
+	}
+
 	return (
 		<>
 			<PressableOpacity
@@ -239,23 +268,30 @@ export default function TaskEdit(
 								<View style={styles.inputRow}>
 									<Text style={styles.inputTitle}>任務優先度</Text>
 									<View style={styles.priorPicker}>
-										<Picker
-											mode="dropdown"
-											selectedValue={priority}
+										<RNPickerSelect
 											onValueChange={(itemValue, itemIndex) =>
 												setPriority(itemValue)
 											}
-										>
-											{Array.from({ length: 5 }, (_, i) => {
-												return (
-													<Picker.Item
-														key={i + 1}
-														label={`${(i + 1).toString()} (${GetPriorityLabel(i + 1)})`}
-														value={i + 1}
-													/>
-												);
-											})}
-										</Picker>
+											placeholder={{}}
+											items={[
+												{ label: '1 (高度優先)', value: 1 },
+												{ label: '2 (中高度優先)', value: 2 },
+												{ label: '3 (中度優先)', value: 3 },
+												{ label: '4 (中低度優先)', value: 4 },
+												{ label: '5 (低度優先)', value: 5 },
+											]}
+											style={{
+												inputIOS: styles.pickerInputIOS,
+												inputIOSContainer: {
+													zIndex: 100,
+												},
+											}}
+											pickerProps={{
+												itemStyle: {
+													color: 'black'
+												}
+											}}
+										/>
 									</View>
 								</View>
 
@@ -289,13 +325,13 @@ export default function TaskEdit(
 										loading={isSubmitting}
 									/>
 
-									{/* HAVENT DONE YET */}
+									{/* TO BE DONE */}
 									<Button
 										buttonStyle={[styles.button, styles.delete]}
 										textStyle={styles.buttonText}
 										title="刪除任務"
 										onPress={() => {
-											setVisible(false);
+											handleDeleteConfirm()
 										}}
 									/>
 
@@ -425,7 +461,7 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderRadius: 8,
 		borderColor: "#b0b0b0",
-		width: "50%",
+		width: wp(40),
 		justifyContent: 'center',
 		height: 40
 	},
@@ -437,5 +473,10 @@ const styles = StyleSheet.create({
 	},
 	errorInput: {
 		borderColor: "#E43636"
+	},
+	pickerInputIOS: {
+		textAlign: 'center',
+		justifyContent: 'center',
+		alignContent: 'center',
 	}
 })
