@@ -3,6 +3,7 @@ export type Profile = {
 	username: string;
 	role: string;
 	phone?: string;
+	avatarUrl?: string;
 	created_at: string;
 };
 

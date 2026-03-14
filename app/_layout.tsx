@@ -7,70 +7,80 @@ import React, { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "../scripts/AuthContext";
 
 export default function Layout() {
-	return (
-		<QueryClientProvider client={queryClient}>
-			<AuthProvider>
-				<RootLayout />
-			</AuthProvider>
-		</QueryClientProvider>
-	);
+    return (
+        <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+                <RootLayout />
+            </AuthProvider>
+        </QueryClientProvider>
+    );
 }
 
 function RootLayout() {
-	const { user, setAuth, setUserData } = useAuth();
-	const router = useRouter();
-	const [mounted, setMounted] = useState(false);
+    const { user, setAuth, setUserData } = useAuth();
+    const router = useRouter();
+    const [mounted, setMounted] = useState(false);
 
-	useEffect(() => {
-		const { data: sub } = supabase.auth.onAuthStateChange(
-			(_event, session) => {
-				setAuth(session?.user ?? null);
-			}
-		);
+    useEffect(() => {
+        const { data: sub } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                setAuth(session?.user ?? null);
+            }
+        );
 
-		return () => sub.subscription.unsubscribe();
-	}, []);
+        return () => sub.subscription.unsubscribe();
+    }, []);
 
-	useEffect(() => {
-		setMounted(true);
-	}, []);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
-	useEffect(() => {
-		if (!mounted) return;
+    useEffect(() => {
+        if (!mounted) return;
 
-		if (user) {
-			router.replace('/');        // 進入 index（tabs 外或內都可）
-		} else {
-			router.replace('/login');
-		}
-	}, [user, mounted]);
+        if (user) {
+            router.replace('/userSettings');        // 進入 index（tabs 外或內都可）
+        } else {
+            router.replace('/login');
+        }
+    }, [user, mounted]);
 
-	return (
-		<Stack>
-			<Stack.Screen
-				name="index"
-				options={{
-					headerShown: true,
-					headerTitle: "我的小組",
-					headerTitleAlign: "center",
-					headerRight: () => <IndexHeader />
-				}}
-			/>
+    return (
+        <Stack>
+            <Stack.Screen
+                name="index"
+                options={{
+                    headerShown: true,
+                    headerTitle: "我的小組",
+                    headerTitleAlign: "center",
+                    headerRight: () => <IndexHeader />
+                }}
+            />
 
-			<Stack.Screen
-				name="groups/[groupId]"
-				options={{ headerShown: false }}
-			/>
+            <Stack.Screen
+                name="groups/[groupId]"
+                options={{ headerShown: false }}
+            />
 
-			<Stack.Screen
-				name="login"
-				options={{ headerShown: false }}
-			/>
+            <Stack.Screen
+                name="login"
+                options={{ headerShown: false }}
+            />
 
-			<Stack.Screen
-				name="signUp"
-				options={{ headerShown: false }}
-			/>
-		</Stack>
-	);
+            <Stack.Screen
+                name="signUp"
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
+                name="userSettings"
+                options={{
+                    headerShown: true,
+                    headerTitle: "使用者設定",
+                    // headerTitleAlign: "center",
+                    // headerRight: () => <IndexHeader />
+                }}
+            />
+        </Stack>
+    );
 }
