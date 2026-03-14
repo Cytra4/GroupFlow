@@ -39,7 +39,7 @@ function RootLayout() {
         if (!mounted) return;
 
         if (user) {
-            router.replace('/userSettings');        // 進入 index（tabs 外或內都可）
+            router.replace('/');        // 進入 index（tabs 外或內都可）
         } else {
             router.replace('/login');
         }

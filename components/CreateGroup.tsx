@@ -75,8 +75,8 @@ export default function CreateGroup() {
 									onChangeText={setGroupName}
 								/>
 
-								{ error &&
-									<Text style={styles.error}>{error}</Text>
+								{ error ?
+									<Text style={styles.error}>{error}</Text> : null
 								}
 
 								<View style={{ flexDirection: 'row' }}>
