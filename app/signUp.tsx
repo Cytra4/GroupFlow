@@ -10,6 +10,7 @@ import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'r
 
 export default function SignUp() {
 	const [error, setError] = useState<string | null>("");
+	const [errorCode, setErrorCode] = useState<number>(0);
 	const router = useRouter();
 
 	const signUpForm = useForm({ username: '', email: '', password: '' });
@@ -20,14 +21,17 @@ export default function SignUp() {
 
 		if (!username) {
 			setError("請輸入使用者名稱");
+			setErrorCode(1);
 			return;
 		}
 		if (!email || !password) {
 			setError("請輸入信箱與密碼");
+			setErrorCode(2);
 			return;
 		}
 		if (password.length < 6) {
 			setError("密碼長度不能少於六位")
+			setErrorCode(3);
 			return;
 		}
 
@@ -67,14 +71,14 @@ export default function SignUp() {
 					<CustomInput
 						placeholder="使用者名稱"
 						onChange={(t) => signUpForm.onChange('username', t)}
-						boxStyle={{ marginBottom: 25 }}
+						boxStyle={[{ marginBottom: 25 }, (errorCode === 1) && {borderColor: "#E43636"}]}
 						iconName='user'
 					/>
 
 					<CustomInput
 						placeholder="信箱"
 						onChange={(t) => signUpForm.onChange('email', t)}
-						boxStyle={{ marginBottom: 25 }}
+						boxStyle={[{ marginBottom: 25 }, (errorCode === 2) && {borderColor: "#E43636"}]}
 						iconName='mail'
 						keyboardType='email-address'
 					/>
@@ -82,7 +86,7 @@ export default function SignUp() {
 					<CustomInput
 						placeholder="密碼"
 						onChange={(t) => signUpForm.onChange('password', t)}
-						boxStyle={{}}
+						boxStyle={[(errorCode >= 2) && {borderColor: "#E43636"}]}
 						iconName='lock'
 						secureText={true}
 					/>
@@ -140,7 +144,7 @@ const styles = StyleSheet.create({
 		marginBottom: 20
 	},
 	error: {
-		color: "red",
+		color: "#E43636",
 		fontSize: 18,
 		marginTop: 5
 	}

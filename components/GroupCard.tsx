@@ -1,6 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { PressableOpacity } from './PressableOpacity';
 
 export function GroupCard({
 	group_name = "AAA",
@@ -12,7 +13,8 @@ export function GroupCard({
 	const formattedDate = created_at.toISOString().split("T")[0];
 
 	return (
-		<TouchableOpacity style={styles.card}
+		<PressableOpacity 
+			PressStyle={styles.card}
 			onPress={onPress}
 		>
 			<View style={[styles.header, { backgroundColor: headerColor }]} />
@@ -38,7 +40,7 @@ export function GroupCard({
 					<Text style={styles.info}>成立時間：{formattedDate}</Text>
 				</View>
 			</View>
-		</TouchableOpacity>
+		</PressableOpacity>
 	)
 }
 
@@ -50,11 +52,12 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		marginVertical: 12,
 		width: "100%",
+
 		shadowColor: '#000',
 		shadowOpacity: 0.1,
 		shadowRadius: 6,
 		shadowOffset: { width: 0, height: 3 },
-		elevation: 3,
+		elevation: 5,
 		overflow: "hidden",
 	},
 	header: {

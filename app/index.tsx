@@ -1,4 +1,4 @@
-import { Button } from '@/components/Button';
+import CreateGroup from '@/components/CreateGroup';
 import { GroupCard } from '@/components/GroupCard';
 import { useGroups } from '@/lib/hooks/idk/useGroups';
 import { useSignOut } from '@/lib/supabase/auth';
@@ -39,26 +39,17 @@ export default function Index() {
         <View style={styles.container}>
             <Text>名稱：{profileQuery.data?.username}</Text>
             <Text>權限：{profileQuery.data?.role === 'user' ? '一般使用者' : profileQuery.data?.role === 'admin' ? '管理員' : "未知"}</Text>
-            <Text
+			<Text
                 onPress={() => signOutMutation.mutate()}
                 style={{ fontSize: 20 }}
             >
                 登出
             </Text>
-            <Button
-                title='Add Group'
-                onPress={() => {
-                    groupInsertMutation.mutate({
-                        table: 'groups', row: {
-                            name: `By ${profileQuery.data?.username}`,
-                            created_by: profileQuery.data?.user_id
-                        }
-                    });
-                }}
-                loading={groupInsertMutation.isPending}
-            />
+
+			<CreateGroup />
 
             <FlatList
+				showsVerticalScrollIndicator={false}
                 data={userGroups}
                 style={{ width: wp(80) }}
                 keyExtractor={(group) => group.id}
@@ -70,7 +61,7 @@ export default function Index() {
                         headerColor={GenColorFromName(item.name)}
                         onPress={() => {
                             router.replace({
-                                pathname: '/groups/[groupId]/calendar',
+                                pathname: `/groups/[groupId]/calendar`,
                                 params: { groupId: item.id },
                             });
                         }
@@ -100,6 +91,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f8f8f8",
+        backgroundColor: "#f2f5f8",
     },
 })

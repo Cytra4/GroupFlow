@@ -21,10 +21,10 @@ export function useAddNewTask() {
 		const due_date = dueDate.toISOString();
 
 		const now = new Date();
-		let taskStatus: "未開始" | "進行中" | "未完成";
+		let taskStatus: "未開始" | "進行中" | "已結束";
 
 		if (now < startDate) taskStatus = "未開始";
-		else if (now > dueDate) taskStatus = "未完成";
+		else if (now > dueDate) taskStatus = "已結束";
 		else taskStatus = "進行中";
 
 		const { data: task, error: taskError } = await supabase

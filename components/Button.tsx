@@ -1,6 +1,7 @@
 import { hp } from "@/scripts/constants";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Loading } from "./Loading";
+import { PressableOpacity } from "./PressableOpacity";
 
 //custom button
 export function Button({
@@ -27,12 +28,12 @@ export function Button({
 		)
 	}
 	return (
-		<TouchableOpacity
+		<PressableOpacity
 			onPress={onPress}
-			style={[styles.button, buttonStyle, hasShadow && shadowStyle]}
+			PressStyle={[styles.button, buttonStyle, hasShadow && shadowStyle]}
 		>
 			<Text style={[styles.text, textStyle]}>{title}</Text>
-		</TouchableOpacity>
+		</PressableOpacity>
 	)
 }
 
