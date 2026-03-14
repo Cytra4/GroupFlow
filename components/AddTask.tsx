@@ -255,7 +255,7 @@ export default function AddTask() {
 										</View>
 									}
 
-									{error && <Text>{error.message}</Text>}
+									{error ? <Text>{error.message}</Text> : null}
 
 									<FlatList
 										data={groupMembers}
@@ -265,7 +265,7 @@ export default function AddTask() {
 									/>
 								</View>
 
-								{addError && <Text style={styles.error}>{addError}</Text>}
+								{addError ? <Text style={styles.error}>{addError}</Text> : null}
 
 								<View style={styles.buttonRow}>
 									<Button
