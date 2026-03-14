@@ -45,7 +45,7 @@ export default function DayDetail() {
 			) : (
 				<View style={styles.content}>
 					<Image
-						source={require("../../../../assets/images/shocked.png")}
+						source={require("@/assets/images/shocked.png")}
 						resizeMode="contain"
 						style={styles.shockedPic}
 					/>
