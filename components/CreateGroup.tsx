@@ -3,7 +3,7 @@ import { useInsert } from "@/lib/supabase/query";
 import { hp } from "@/scripts/constants";
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from "react";
-import { Modal, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Button } from "./Button";
 
 export default function CreateGroup() {
@@ -60,49 +60,47 @@ export default function CreateGroup() {
 				onRequestClose={() => setVisible(false)}
 				statusBarTranslucent
 			>
-				<TouchableWithoutFeedback
-					onPress={() => setVisible(false)}
-				>
-					<View style={styles.centeredView}>
-						<TouchableWithoutFeedback>
-							<View style={styles.modalView}>
-								<Text style={styles.title}>建立你的小組</Text>
-								<TextInput
-									style={[styles.input, error && {borderColor: "#E43636"}]}
-									placeholder="請輸入小組名稱"
-									placeholderTextColor={"#939393"}
-									value={groupName}
-									onChangeText={setGroupName}
-								/>
+				<View style={styles.centeredView}>
+					<Pressable
+						style={StyleSheet.absoluteFill}
+						onPress={() => setVisible(false)}
+					/>
+					<View style={styles.modalView}>
+						<Text style={styles.title}>建立你的小組</Text>
+						<TextInput
+							style={[styles.input, error && { borderColor: "#E43636" }]}
+							placeholder="請輸入小組名稱"
+							placeholderTextColor={"#939393"}
+							value={groupName}
+							onChangeText={setGroupName}
+						/>
 
-								{ error ?
-									<Text style={styles.error}>{error}</Text> : null
-								}
+						{error ?
+							<Text style={styles.error}>{error}</Text> : null
+						}
 
-								<View style={{ flexDirection: 'row' }}>
-									<Button
-										title="建立"
-										buttonStyle={[styles.modalButton, styles.createButton]}
-										textStyle={styles.buttonText}
-										onPress={HandleJoin}
-										loading={loading}
-									/>
-									
-									<Button
-										title="取消"
-										buttonStyle={[styles.modalButton, styles.cancelButton]}
-										textStyle={styles.buttonText}
-										onPress={() => {
-											setGroupName("");
-											setError("");
-											setVisible(false);
-										}}
-									/>
-								</View>
-							</View>
-						</TouchableWithoutFeedback>
+						<View style={{ flexDirection: 'row' }}>
+							<Button
+								title="建立"
+								buttonStyle={[styles.modalButton, styles.createButton]}
+								textStyle={styles.buttonText}
+								onPress={HandleJoin}
+								loading={loading}
+							/>
+
+							<Button
+								title="取消"
+								buttonStyle={[styles.modalButton, styles.cancelButton]}
+								textStyle={styles.buttonText}
+								onPress={() => {
+									setGroupName("");
+									setError("");
+									setVisible(false);
+								}}
+							/>
+						</View>
 					</View>
-				</TouchableWithoutFeedback>
+				</View>
 			</Modal>
 		</>
 	)

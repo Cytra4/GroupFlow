@@ -2,7 +2,7 @@ import { useTaskMembers } from "@/lib/hooks/useTaskMembers";
 import { Task } from "@/types/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Modal, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Button } from "./Button";
 import IconRow from "./IconRow";
 import { PressableOpacity } from "./PressableOpacity";
@@ -38,7 +38,7 @@ export default function TaskDetail(
 	return (
 		<>
 			<PressableOpacity
-				PressStyle={[styles.iconButton,iconStyle]}
+				PressStyle={[styles.iconButton, iconStyle]}
 				onPress={() => setVisible(true)}
 			>
 				<Ionicons name="information-circle-outline" size={iconSize ?? 30} color={iconColor ?? "blue"} />
@@ -51,58 +51,56 @@ export default function TaskDetail(
 				onRequestClose={() => setVisible(false)}
 				statusBarTranslucent
 			>
-				<TouchableWithoutFeedback
-					onPress={() => setVisible(false)}
-				>
-					<View style={styles.centeredView}>
-						<TouchableWithoutFeedback>
-							<View style={[styles.modalView, { borderWidth: 3.5, borderColor: iconColor ?? "blue" }]}>
-								<Text style={styles.title}>{taskData?.title}</Text>
+				<View style={styles.centeredView}>
+					<Pressable
+						style={StyleSheet.absoluteFill}
+						onPress={() => setVisible(false)}
+					/>
+					<View style={[styles.modalView, { borderWidth: 3.5, borderColor: iconColor ?? "blue" }]}>
+						<Text style={styles.title}>{taskData?.title}</Text>
 
-								<View style={styles.line} />
+						<View style={styles.line} />
 
-								<Text style={styles.sectionTitle}>任務內容</Text>
-								<Text style={styles.taskDesc}>{taskData?.description ?? ""}</Text>
+						<Text style={styles.sectionTitle}>任務內容</Text>
+						<Text style={styles.taskDesc}>{taskData?.description ?? ""}</Text>
 
-								<View style={styles.line} />
+						<View style={styles.line} />
 
-								<Text style={styles.sectionTitle}>任務資訊</Text>
-								<IconRow
-									icon={"calendar-outline"}
-									info={time ?? ""}
-									iconSize={25}
-								/>
-								<IconRow
-									icon={"flag-outline"}
-									iconColor={iconColor}
-									info={`${GetPriorityLabel(taskData?.priority ?? 0)}任務`}
-									iconSize={25}
-								/>
+						<Text style={styles.sectionTitle}>任務資訊</Text>
+						<IconRow
+							icon={"calendar-outline"}
+							info={time ?? ""}
+							iconSize={25}
+						/>
+						<IconRow
+							icon={"flag-outline"}
+							iconColor={iconColor}
+							info={`${GetPriorityLabel(taskData?.priority ?? 0)}任務`}
+							iconSize={25}
+						/>
 
-								<View style={styles.line} />
+						<View style={styles.line} />
 
-								<Text style={styles.sectionTitle}>任務成員</Text>
+						<Text style={styles.sectionTitle}>任務成員</Text>
 
-								{/* TO BE DONE */}
-								{/* 這邊可能之後得改成使用FlatList，然後要加上頭像 */}
-								{membersData?.map((member, index) => {
-									return (
-										<Text key={index} style={styles.memberName}>
-											{member.profiles.username}
-										</Text>
-									)
-								})}
+						{/* TO BE DONE */}
+						{/* 這邊可能之後得改成使用FlatList，然後要加上頭像 */}
+						{membersData?.map((member, index) => {
+							return (
+								<Text key={index} style={styles.memberName}>
+									{member.profiles.username}
+								</Text>
+							)
+						})}
 
-								<Button
-									buttonStyle={styles.button}
-									textStyle={styles.buttonText}
-									title="確認"
-									onPress={() => setVisible(false)}
-								/>
-							</View>
-						</TouchableWithoutFeedback>
+						<Button
+							buttonStyle={styles.button}
+							textStyle={styles.buttonText}
+							title="確認"
+							onPress={() => setVisible(false)}
+						/>
 					</View>
-				</TouchableWithoutFeedback>
+				</View>
 			</Modal>
 		</>
 	)

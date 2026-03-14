@@ -2,11 +2,11 @@ import eventBus from '@/lib/eventBus';
 import { useJoinGroup } from '@/lib/supabase/models/group';
 import Feather from '@expo/vector-icons/Feather';
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function JoinGroup() {
 	const [error, setError] = useState<string>("");
-	const [code, setCode] = useState<string | undefined>("");
+	const [code, setCode] = useState<string>("");
 	const [visible, setVisible] = useState(false);
 
 	const joinGroupMutation = useJoinGroup();
@@ -58,41 +58,40 @@ export default function JoinGroup() {
 				onRequestClose={() => setVisible(false)}
 				statusBarTranslucent
 			>
-				<TouchableWithoutFeedback
-					onPress={() => setVisible(false)}
-				>
-					<View style={styles.centeredView}>
-						<TouchableWithoutFeedback>
-							<View style={styles.modalView}>
-								<Text style={styles.modalTitle}>加入小組</Text>
+				<View style={styles.centeredView}>
+					<Pressable
+						style={StyleSheet.absoluteFill}
+						onPress={() => setVisible(false)}
+					/>
 
-								<TextInput
-									style={[styles.input, error ? styles.errorInput : {}]}
-									placeholder="請輸入小組代碼"
-									placeholderTextColor={"#939393"}
-									value={code}
-									onChangeText={setCode}
-								/>
+					<View style={styles.modalView}>
+						<Text style={styles.modalTitle}>加入小組</Text>
 
-								{error ? <Text style={styles.error}>{error}</Text> : null}
+						<TextInput
+							style={[styles.input, error ? styles.errorInput : {}]}
+							placeholder="請輸入小組代碼"
+							placeholderTextColor={"#939393"}
+							value={code}
+							onChangeText={setCode}
+						/>
 
-								<View style={styles.buttonRow}>
-									<Pressable
-										style={[styles.button, styles.join]}
-										onPress={handleJoin}
-										disabled={joinGroupMutation.isPending}
-									>
-										<Text style={styles.buttonText}>加入</Text>
-									</Pressable>
-									
-									<Pressable style={[styles.button, styles.cancel]} onPress={() => setVisible(false)}>
-										<Text style={styles.buttonText}>取消</Text>
-									</Pressable>
-								</View>
-							</View>
-						</TouchableWithoutFeedback>
+						{error ? <Text style={styles.error}>{error}</Text> : null}
+
+						<View style={styles.buttonRow}>
+							<Pressable
+								style={[styles.button, styles.join]}
+								onPress={handleJoin}
+								disabled={joinGroupMutation.isPending}
+							>
+								<Text style={styles.buttonText}>加入</Text>
+							</Pressable>
+
+							<Pressable style={[styles.button, styles.cancel]} onPress={() => setVisible(false)}>
+								<Text style={styles.buttonText}>取消</Text>
+							</Pressable>
+						</View>
 					</View>
-				</TouchableWithoutFeedback>
+				</View>
 			</Modal>
 		</>
 	);
