@@ -35,12 +35,7 @@ export function useUpdateTask() {
 			const start_date = startDate.toISOString();
 			const due_date = endDate.toISOString();
 
-			const now = new Date();
-			let taskStatus: "未開始" | "進行中" | "已結束";
-
-			if (now < startDate) taskStatus = "未開始";
-			else if (now > endDate) taskStatus = "已結束";
-			else taskStatus = "進行中";
+			let taskStatus = "unfinished";
 
 			const { data, error } = await supabase
 				.from("task")

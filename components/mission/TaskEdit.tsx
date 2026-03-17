@@ -7,7 +7,7 @@ import { Task } from "@/types/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import { Button } from "../Button";
 import { Loading } from "../Loading";
@@ -70,8 +70,6 @@ export default function TaskEdit(
 		}
 	}, [taskMembersData]);
 
-	//TO BE DONE
-	//* 這邊之後除了名稱以外應該也要加上成員頭像
 	const renderMember = ({ item }: { item: GroupMember }) => {
 		const userID = item.user_id;
 		const checked = selectedUserIds.includes(userID);
@@ -89,6 +87,16 @@ export default function TaskEdit(
 				>
 					{checked && <Text style={styles.checkmark}>✓</Text>}
 				</View>
+
+				<Image
+					source={{ uri: item.profiles.avatarUrl || "https://picsum.photos/200" }}
+					style={{
+						width: 35,
+						height: 35,
+						borderRadius: 65,
+						marginHorizontal: 8
+					}}
+				/>
 
 				<Text style={styles.memberName}>
 					{item.profiles.username}
@@ -201,6 +209,25 @@ export default function TaskEdit(
 		)
 	}
 
+	const resetTaskData = () => {
+		setTaskTitle(taskData?.title ?? "");
+		setTaskContent(taskData?.description ?? "");
+		setStartDate(
+			taskData?.start_date ?
+				new Date(taskData?.start_date) :
+				new Date()
+		);
+		setEndDate(
+			taskData?.due_date ?
+				new Date(taskData?.due_date) :
+				new Date()
+		);
+		setPriority(taskData?.priority ?? 1);
+		if (taskMembersData) {
+			setSelectedUserIds(taskMembersData.map(m => m.user_id));
+		}
+	}
+
 	return (
 		<>
 			<PressableOpacity
@@ -214,13 +241,19 @@ export default function TaskEdit(
 				transparent
 				animationType="fade"
 				visible={visible}
-				onRequestClose={() => setVisible(false)}
+				onRequestClose={() => {
+					resetTaskData()
+					setVisible(false)
+				}}
 				statusBarTranslucent
 			>
 				<View style={styles.centeredView}>
 					<Pressable
 						style={StyleSheet.absoluteFill}
-						onPress={() => setVisible(false)}
+						onPress={() => {
+							resetTaskData()
+							setVisible(false)
+						}}
 					/>
 					<View style={[styles.modalView, { borderWidth: 3.5, borderColor: iconColor ?? "blue" }]}>
 						<Text style={styles.title}>修改任務</Text>
@@ -340,7 +373,8 @@ export default function TaskEdit(
 								textStyle={styles.buttonText}
 								title="取消"
 								onPress={() => {
-									setVisible(false);
+									resetTaskData()
+									setVisible(false)
 								}}
 							/>
 						</View>

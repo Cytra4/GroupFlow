@@ -2,7 +2,7 @@ import { useTaskMembers } from "@/lib/hooks/useTaskMembers";
 import { Task } from "@/types/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Button } from "./Button";
 import IconRow from "./IconRow";
 import { PressableOpacity } from "./PressableOpacity";
@@ -83,13 +83,23 @@ export default function TaskDetail(
 
 						<Text style={styles.sectionTitle}>任務成員</Text>
 
-						{/* TO BE DONE */}
-						{/* 這邊可能之後得改成使用FlatList，然後要加上頭像 */}
 						{membersData?.map((member, index) => {
 							return (
-								<Text key={index} style={styles.memberName}>
-									{member.profiles.username}
-								</Text>
+								<View key={index} style={styles.memberRow}>
+									<Image
+										source={{ uri: member.profiles.avatarUrl || "https://picsum.photos/200" }}
+										style={{
+											width: 35,
+											height: 35,
+											borderRadius: 65,
+											marginHorizontal: 8
+										}}
+									/>
+
+									<Text style={styles.memberName}>
+										{member.profiles.username}
+									</Text>
+								</View>
 							)
 						})}
 
@@ -161,5 +171,10 @@ const styles = StyleSheet.create({
 	iconButton: {
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	memberRow: {
+		flexDirection:"row",
+		alignItems: 'center',
+		margin: 5
 	}
 })

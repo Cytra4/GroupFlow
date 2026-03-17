@@ -7,7 +7,8 @@ export type TaskMember = {
 	user_id: string;  
 	profiles: { 
 		user_id: string;
-		 username: string; 
+		username: string;
+		avatarUrl: string;
 	}[]; 
 }; 
 
@@ -25,7 +26,8 @@ export function useTaskMembers(taskId: number) {
 				user_id,  
 				profiles( 
 					user_id, 
-					username
+					username,
+					avatarUrl
 				) 
 				`) 
 				.eq("task_id",taskId) 

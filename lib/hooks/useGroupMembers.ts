@@ -8,6 +8,7 @@ export type GroupMember = {
 	profiles: {
 		user_id: string;
 		username: string;
+		avatarUrl: string;
 	}[];
 };
 
@@ -25,7 +26,8 @@ export function useGroupMembers(groupId: string) {
 				joined_at, 
 				profiles( 
 					user_id, 
-					username
+					username,
+					avatarUrl
 				) 
 				`)
 				.eq("group_id", groupId)

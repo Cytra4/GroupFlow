@@ -3,7 +3,7 @@ import { useAddNewTask } from "@/lib/supabase/models/task";
 import { wp } from "@/scripts/constants";
 import { useGlobalSearchParams } from "expo-router";
 import { useState } from "react";
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import { Button } from "./Button";
 import DatePicker from "./datePicker/DatePicker";
@@ -59,8 +59,6 @@ export default function AddTask() {
 		)
 	}
 
-	//TO BE DONE
-	//* 這邊之後除了名稱以外應該也要加上成員頭像
 	const renderMember = ({ item }: { item: GroupMember }) => {
 		const userID = item.user_id;
 		const checked = selectedUserIds.includes(userID);
@@ -78,6 +76,16 @@ export default function AddTask() {
 				>
 					{checked && <Text style={styles.checkmark}>✓</Text>}
 				</View>
+
+				<Image
+					source={{ uri: item.profiles.avatarUrl || "https://picsum.photos/200" }}
+					style={{
+						width: 35,
+						height: 35,
+						borderRadius: 65,
+						marginHorizontal: 8
+					}}
+				/>
 
 				<Text style={styles.memberName}>
 					{item.profiles.username}
