@@ -2,6 +2,7 @@ import { Task } from "@/types/supabase";
 import { StyleSheet, Text, View } from "react-native";
 import TaskDetail from "./TaskDetail";
 import TaskEdit from "./mission/TaskEdit";
+import TaskFinish from "./mission/TaskFinish";
 
 function getPriorityColor(priority: number) {
 	switch (priority) {
@@ -29,12 +30,13 @@ export default function TaskCard({
 	mode = "ViewOnly",
 }: {
 	taskData: Task;
-	mode?: "ViewOnly" | "Editable";
+	mode?: "ViewOnly" | "Editable" | "Finished";
 }) {
 
 	const priorityColor = getPriorityColor(taskData.priority);
 	const dateRange = GetDateRange(taskData.start_date, taskData.due_date);
 	const isEditable = mode === "Editable";
+	const isFinished = mode === "Finished";
 
 	return (
 		<View
@@ -43,9 +45,9 @@ export default function TaskCard({
 				{
 					borderColor: priorityColor,
 					flexDirection: "column",
-					borderRadius: isEditable ? 0 : 16
+					borderRadius: isEditable || isFinished ? 0 : 16
 				},
-				isEditable && {borderColor: "#eee"}
+				(isEditable || isFinished) && {borderColor: "#eee"}
 			]}
 		>
 			<View style={styles.row}>
@@ -75,11 +77,10 @@ export default function TaskCard({
 			{isEditable && (
 				<>
 					<View style={styles.iconTabs}>
-						<TaskDetail
+						<TaskFinish
 							iconColor={priorityColor}
 							iconStyle={{marginBottom: -10}}
 							taskData={taskData}
-							time={dateRange}
 						/>
 						<TaskDetail
 							iconColor={priorityColor}

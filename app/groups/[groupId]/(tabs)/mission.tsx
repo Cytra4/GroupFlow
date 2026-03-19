@@ -42,7 +42,7 @@ export default function Mission() {
 		t => t.status === "unfinished" && t.timeStatus === "已結束"
 	);
 	const completedTasks = tasksWithTimeStatus?.filter(
-		t => t.status === "completed"
+		t => t.status === "finished"
 	);
 
 	return (
@@ -103,7 +103,7 @@ export default function Mission() {
 						<TaskCard
 							key={task.id}
 							taskData={task}
-							mode="Editable"
+							mode="Finished"
 						/>
 					))}
 				</TaskSection>

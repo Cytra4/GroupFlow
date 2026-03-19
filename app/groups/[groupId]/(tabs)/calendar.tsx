@@ -79,11 +79,12 @@ export default function GroupCalendar() {
 	const router = useRouter();
 
 	//取得任務資料
-	const {
+	let {
 		data: groupTasks,
 		isLoading,
 		error,
 	} = useTask(groupId || "");
+	groupTasks = groupTasks?.filter(t => t.status == "unfinished")
 
 	if (isLoading) return (
 		<View style={[styles.container,{justifyContent: 'center', alignItems: 'center'}]}>

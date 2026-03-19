@@ -18,6 +18,11 @@ type UpdateTaskMembersInput = {
 	currentUserIds: string[];
 };
 
+type FinishTaskInput = {
+	taskId: number;
+	groupId: string;
+}
+
 //更新任務內容
 export function useUpdateTask() {
 	const queryClient = useQueryClient();
@@ -112,6 +117,36 @@ export function useUpdateTaskMembers() {
 		onSuccess: (_, { taskId }) => {
 			queryClient.invalidateQueries({
 				queryKey: ["tasks", taskId, "members"],
+			});
+		}
+	})
+}
+
+export function useFinishTask() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			taskId,
+			groupId,
+		}: FinishTaskInput) => {
+			const { data, error } = await supabase
+				.from("task")
+				.update({
+					status: "finished",
+				})
+				.eq("id", taskId)
+				
+			if (error) throw error;
+		},
+
+		onSuccess: (_, { groupId }) => {
+			queryClient.invalidateQueries({
+				queryKey: ["tasks", groupId],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: ["user_tasks", groupId],
 			});
 		}
 	})
