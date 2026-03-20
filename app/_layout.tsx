@@ -73,13 +73,8 @@ function RootLayout() {
             />
 
             <Stack.Screen
-                name="userSettings"
-                options={{
-                    headerShown: true,
-                    headerTitle: "使用者設定",
-                    // headerTitleAlign: "center",
-                    // headerRight: () => <IndexHeader />
-                }}
+                name="settings"
+                options={{ headerShown: false, }}
             />
         </Stack>
     );

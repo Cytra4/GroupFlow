@@ -1,4 +1,4 @@
-import { useProfile } from "@/lib/supabase/models/profile";
+import { useProfile } from "@/lib/hooks/auth/profile";
 import { useInsert } from "@/lib/supabase/query";
 import { hp } from "@/scripts/constants";
 import { useQueryClient } from '@tanstack/react-query';

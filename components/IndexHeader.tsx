@@ -12,7 +12,7 @@ export default function IndexHeader() {
                 name="settings"
                 size={24}
                 style={{ marginRight: 16 }}
-                onPress={() => { router.push('/userSettings'); }}
+                onPress={() => { router.push('/settings'); }}
             />
         </>
     );

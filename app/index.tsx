@@ -1,13 +1,13 @@
 import CreateGroup from '@/components/CreateGroup';
 import { GroupCard } from '@/components/GroupCard';
+import { useProfile } from '@/lib/hooks/auth/profile';
 import { useGroups } from '@/lib/hooks/idk/useGroups';
 import { useSignOut } from '@/lib/supabase/auth';
-import { useProfile } from '@/lib/supabase/models/profile';
 import { useInsert } from '@/lib/supabase/query';
 import { wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 export default function Index() {
     const router = useRouter();
@@ -31,21 +31,12 @@ export default function Index() {
         return `hsl(${hue}, 70%, 60%)`;
     }
 
-    if (profileQuery.data) {
-        console.log('Logged in as:', profileQuery.data, 'Profile:', profileQuery.data);
-    }
+    // if (profileQuery.data) {
+    //     console.log('Logged in as:', profileQuery.data, 'Profile:', profileQuery.data);
+    // }
 
     return (
         <View style={styles.container}>
-            <Text>名稱：{profileQuery.data?.username}</Text>
-            <Text>權限：{profileQuery.data?.role === 'user' ? '一般使用者' : profileQuery.data?.role === 'admin' ? '管理員' : "未知"}</Text>
-			<Text
-                onPress={() => signOutMutation.mutate()}
-                style={{ fontSize: 20 }}
-            >
-                登出
-            </Text>
-
 			<CreateGroup />
 
             <FlatList
