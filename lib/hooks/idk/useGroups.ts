@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase/client";
 import { Group } from "@/types/supabase";
 import { useQuery } from "@tanstack/react-query";
 
-export function useGroups(userId: string) {
+export function useGroups(userId?: string) {
 	return useQuery<Group[], Error>({
 		queryKey: ["groups"],
 		queryFn: async () => {
@@ -17,5 +17,6 @@ export function useGroups(userId: string) {
 			// Each row looks like { groups: { ...Group } }
 			return data.flatMap((gm) => gm.groups as Group[]);
 		},
+		enabled: !!userId, // only run if userId is available
 	});
 }

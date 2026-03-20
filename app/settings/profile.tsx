@@ -64,7 +64,6 @@ export default function ProfileSettings() {
                 ) : null,
             }}
         />
-
         <View style={styles.container}>
             {/* Avatar Section */}
             <View style={styles.avatarContainer}>
@@ -89,6 +88,7 @@ export default function ProfileSettings() {
                 </Pressable>
             </View>
 
+
             { /* Other settings sections */}
             <View style={styles.inputBoxes}>
                 <LabelInput
@@ -99,7 +99,7 @@ export default function ProfileSettings() {
                         const { error } = checkName(text);
                         setErrors((prev) => ({ ...prev, username: error ?? "" }));
                         setFormDraft((draft) => ({ ...draft, username: text }));
-                        setModified({ ...modified, form: true });
+                        setModified((prev) => ({ ...prev, form: true }));
                     }}
                     error={errors.username}
                 />
@@ -116,7 +116,7 @@ export default function ProfileSettings() {
                         const { error } = checkPhone(text);
                         setErrors((prev) => ({ ...prev, phone: error ?? "" }));
                         setFormDraft((draft) => ({ ...draft, phone: text }));
-                        setModified({ ...modified, form: true });
+                        setModified((prev) => ({ ...prev, form: true }));
                     }}
                     error={errors.phone}
                 />
@@ -213,7 +213,7 @@ function LabelInput({ label, value, type = "text", onChange, error }: LabelInput
                 style={[styles.textInput, type === "email" && styles.lockedInput]}
                 editable={type !== "email"}
             />
-            {error && <Text style={styles.errorMsg}>{error}</Text>}
+            {Boolean(error) && <Text style={styles.errorMsg}>{error}</Text>}
         </View>
     );
 }

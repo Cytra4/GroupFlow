@@ -2,7 +2,7 @@ import { useLogout } from "@/lib/hooks/auth/user";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { ReactNode } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function SettingsIndex() {
     const router = useRouter();
@@ -15,22 +15,22 @@ export default function SettingsIndex() {
         // { id: "about", title: "關於我們", route: "about" },
     ];
 
-    return (<>
-        {sections.map((section) => (
-            <SettingsSection
-                key={section.id}
-                onPress={() => router.push(`/settings/${section.id}` as Href)}
-            >
-                <Text>{section.title}</Text>
-            </SettingsSection>
-        ))}
+    return (
+        <View style={styles.container}>
+            {sections.map((section) => (
+                <SettingsSection
+                    key={section.id}
+                    onPress={() => router.push(`/settings/${section.id}` as Href)}
+                >
+                    <Text>{section.title}</Text>
+                </SettingsSection>
+            ))}
 
-        <SettingsSection withIcon={false} onPress={useLogout().mutate}>
-            <Pressable>
+            <SettingsSection withIcon={false} onPress={useLogout().mutate}>
                 <Text style={{ color: "coral" }}>登出</Text>
-            </Pressable>
-        </SettingsSection>
-    </>);
+            </SettingsSection>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({

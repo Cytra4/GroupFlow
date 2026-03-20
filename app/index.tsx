@@ -2,8 +2,6 @@ import CreateGroup from '@/components/CreateGroup';
 import { GroupCard } from '@/components/GroupCard';
 import { useProfile } from '@/lib/hooks/auth/profile';
 import { useGroups } from '@/lib/hooks/idk/useGroups';
-import { useSignOut } from '@/lib/supabase/auth';
-import { useInsert } from '@/lib/supabase/query';
 import { wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -12,14 +10,8 @@ import { FlatList, StyleSheet, View } from 'react-native';
 export default function Index() {
     const router = useRouter();
 
-    const signOutMutation = useSignOut();
     const profileQuery = useProfile();
-    
-    const groupInsertMutation = useInsert();
-
-    const { data: userGroups } = useGroups(profileQuery.data?.user_id || '');
-
-    // console.log('User Groups:', userGroups);
+    const { data: userGroups } = useGroups(profileQuery.data?.user_id);
 
     //根據小組名稱生成header顏色
     function GenColorFromName(group_name: string) {
@@ -30,10 +22,6 @@ export default function Index() {
         const hue = Math.abs(hash) % 360;
         return `hsl(${hue}, 70%, 60%)`;
     }
-
-    // if (profileQuery.data) {
-    //     console.log('Logged in as:', profileQuery.data, 'Profile:', profileQuery.data);
-    // }
 
     return (
         <View style={styles.container}>
