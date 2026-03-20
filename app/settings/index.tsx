@@ -15,24 +15,22 @@ export default function SettingsIndex() {
         // { id: "about", title: "關於我們", route: "about" },
     ];
 
-    return (
-        <>
-            {sections.map((section) => (
-                <SettingsSection
-                    key={section.id}
-                    onPress={() => router.push(`/settings/${section.id}` as Href)}
-                >
-                    <Text>{section.title}</Text>
-                </SettingsSection>
-            ))}
-
-            <SettingsSection withIcon={false} onPress={useLogout().mutate}>
-                <Pressable>
-                    <Text style={{ color: "coral" }}>登出</Text>
-                </Pressable>
+    return (<>
+        {sections.map((section) => (
+            <SettingsSection
+                key={section.id}
+                onPress={() => router.push(`/settings/${section.id}` as Href)}
+            >
+                <Text>{section.title}</Text>
             </SettingsSection>
-        </>
-    );
+        ))}
+
+        <SettingsSection withIcon={false} onPress={useLogout().mutate}>
+            <Pressable>
+                <Text style={{ color: "coral" }}>登出</Text>
+            </Pressable>
+        </SettingsSection>
+    </>);
 }
 
 const styles = StyleSheet.create({

@@ -1,6 +1,6 @@
 
-import { useProfile, UserProfile } from "@/lib/hooks/auth/profile";
-import { supabase } from "@/lib/supabase/client";
+import { useProfile, useUpdateProfile } from "@/lib/hooks/auth/profile";
+import { Profile } from "@/types/supabase";
 import * as ImagePicker from "expo-image-picker";
 import { Stack } from "expo-router";
 import React from "react";
@@ -9,9 +9,13 @@ import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-nativ
 
 export default function ProfileSettings() {
     const { data: profile } = useProfile();
+    const updateProfile = useUpdateProfile();
 
-    const [formDraft, setFormDraft] = React.useState<Partial<UserProfile>>({});
+    const [formDraft, setFormDraft] = React.useState<Partial<Profile>>({});
     const [modified, setModified] = React.useState({ avatar: false, form: false });
+    const [errors, setErrors] = React.useState({ username: "", phone: "" });
+
+    const loadingText = useDotAnimation("儲存中");
 
     async function PickImage() {
         // 先請求權限
@@ -38,35 +42,26 @@ export default function ProfileSettings() {
 
     async function saveProfile() {
         if (!profile) return;
+        if (formDraft.username && !checkName(formDraft.username).valid) return;
+        if (formDraft.phone && !checkPhone(formDraft.phone).valid) return;
 
-        let draft = { ...formDraft };
-
-        if (draft.avatarUrl && draft.avatarUrl.startsWith("file:")) {
-            draft.avatarUrl = await uploadAvatar(draft.avatarUrl, profile.user_id);
-        }
-
-        const { error } = await supabase
-            .from("profiles")
-            .update(draft)
-            .eq("user_id", profile?.user_id);
-
-        if (error) {
-            console.log("Profile settings update error: " + error.message);
-            return;
-        }
-
-        setModified({ avatar: false, form: false });
+        updateProfile.mutate({ ...formDraft, user_id: profile.user_id }, {
+            onSuccess: () => {
+                setModified({ avatar: false, form: false });
+            }
+        });
     }
 
     return (<>
         <Stack.Screen
             options={{
-                headerRight: () =>
-                    (modified.avatar || modified.form) ? (
-                        <Pressable onPress={() => { saveProfile() }}>
-                            <Text style={styles.saveText}>保存</Text>
-                        </Pressable>
-                    ) : null,
+                headerRight: () => (modified.avatar || modified.form) ? (
+                    <Pressable onPress={saveProfile}>
+                        <Text style={styles.saveText}>
+                            {updateProfile.isPending ? loadingText : "儲存"}
+                        </Text>
+                    </Pressable>
+                ) : null,
             }}
         />
 
@@ -101,27 +96,29 @@ export default function ProfileSettings() {
                     value={formDraft.username ?? profile?.username ?? ""}
                     type="text"
                     onChange={(text) => {
+                        const { error } = checkName(text);
+                        setErrors((prev) => ({ ...prev, username: error ?? "" }));
                         setFormDraft((draft) => ({ ...draft, username: text }));
                         setModified({ ...modified, form: true });
                     }}
+                    error={errors.username}
                 />
                 <LabelInput
                     label="信箱"
-                    value={formDraft.email ?? profile?.email ?? ""}
+                    value={profile?.email ?? ""}
                     type="email"
-                    onChange={(text) => {
-                        setFormDraft((draft) => ({ ...draft, email: text }));
-                        setModified({ ...modified, form: true });
-                    }}
                 />
                 <LabelInput
                     label="電話"
                     value={formDraft.phone ?? profile?.phone ?? ""}
                     type="text"
                     onChange={(text) => {
+                        const { error } = checkPhone(text);
+                        setErrors((prev) => ({ ...prev, phone: error ?? "" }));
                         setFormDraft((draft) => ({ ...draft, phone: text }));
                         setModified({ ...modified, form: true });
                     }}
+                    error={errors.phone}
                 />
             </View>
         </View>
@@ -131,6 +128,8 @@ export default function ProfileSettings() {
 const styles = StyleSheet.create({
     saveText: {
         marginRight: 20,
+        color: "coral",
+        fontSize: 16,
     },
     container: {
         flex: 1,
@@ -168,6 +167,14 @@ const styles = StyleSheet.create({
     },
     inputBox: {
         userSelect: "none",
+        position: "relative",
+    },
+    errorMsg: {
+        position: "absolute",
+        bottom: -18,
+        left: 0,
+        color: "#e00",
+        fontSize: 12,
     },
     inputLabel: {
         fontSize: 16,
@@ -190,10 +197,11 @@ type LabelInputProps = {
     label: string;
     value: string;
     type?: "text" | "email" | "password";
-    onChange: (text: string) => void;
+    onChange?: (text: string) => void;
+    error?: string;
 }
 
-function LabelInput({ label, value, type = "text", onChange }: LabelInputProps) {
+function LabelInput({ label, value, type = "text", onChange, error }: LabelInputProps) {
     return (
         <View style={styles.inputBox}>
             <Text>{label}</Text>
@@ -205,54 +213,36 @@ function LabelInput({ label, value, type = "text", onChange }: LabelInputProps) 
                 style={[styles.textInput, type === "email" && styles.lockedInput]}
                 editable={type !== "email"}
             />
+            {error && <Text style={styles.errorMsg}>{error}</Text>}
         </View>
     );
 }
 
-import CryptoJS from "crypto-js";
-import { Platform } from "react-native";
+function useDotAnimation(baseText: string) {
+    const [dots, setDots] = React.useState("");
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+        }, 500);
+        return () => clearInterval(interval);
+    }, []);
+    return baseText + dots;
+}
 
-export async function uploadAvatar(uri: string, userId: string): Promise<string> {
-    const config = {
-        cloud_name: "dq8jvjcv4",
-        api_key: "668727717621116",
-        api_secret: "xpCfuSucQ3IeK_B2fOf7TJFry2I",
-    };
-
-    const publicId = `user_${userId}`;
-    const folder = "avatars";
-    const timestamp = Math.floor(Date.now() / 1000);
-
-    const toSign = `folder=${folder}&public_id=${publicId}&timestamp=${timestamp}${config.api_secret}`;
-    const signature = CryptoJS.SHA1(toSign).toString();
-
-    const data = new FormData();
-
-    if (Platform.OS === "web" && uri.startsWith("blob:")) {
-        const res = await fetch(uri);
-        const blob = await res.blob();
-        data.append("file", blob, `avatar_${userId}.png`);
-    } else {
-        data.append("file", {
-            uri,
-            type: "image/jpeg",
-            name: `avatar_${userId}.jpg`,
-        } as any);
+function checkName(name: string): { valid: boolean; error?: string } {
+    if (!name.trim()) {
+        return { valid: false, error: "名稱不能為空" };
     }
+    if (name.length < 6 || name.length > 10) {
+        return { valid: false, error: "名稱長度必須在6到10個字符之間" };
+    }
+    return { valid: true };
+}
 
-    data.append("public_id", publicId);
-    data.append("folder", folder);
-    data.append("timestamp", timestamp.toString());
-    data.append("api_key", config.api_key);
-    data.append("signature", signature);
-
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${config.cloud_name}/image/upload`, {
-        method: "POST",
-        body: data,
-    });
-
-    const json = await res.json();
-    console.log("Cloudinary response:", json);
-
-    return `${json.secure_url}?t=${Date.now()}`;
+function checkPhone(phone: string): { valid: boolean; error?: string } {
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+        return { valid: false, error: "電話號碼必須是10位數字" };
+    }
+    return { valid: true };
 }
