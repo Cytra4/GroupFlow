@@ -1,7 +1,7 @@
 import CreateGroup from '@/components/CreateGroup';
 import { GroupCard } from '@/components/GroupCard';
 import { useProfile } from '@/lib/hooks/auth/profile';
-import { useGroups } from '@/lib/hooks/idk/useGroups';
+import { useUserGroups } from '@/lib/hooks/idk/useGroups';
 import { wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -11,7 +11,7 @@ export default function Index() {
     const router = useRouter();
 
     const profileQuery = useProfile();
-    const { data: userGroups } = useGroups(profileQuery.data?.user_id);
+    const { data: userGroups } = useUserGroups(profileQuery.data?.user_id ?? "");
 
     //根據小組名稱生成header顏色
     function GenColorFromName(group_name: string) {
@@ -48,19 +48,6 @@ export default function Index() {
                     />
                 )}
             />
-
-            {/* <FlatList
-					data={groups}
-					keyExtractor={(group) => group.id}
-					renderItem={({ item }) => (
-						<View style={{ padding: 10, borderBottomWidth: 1, borderColor: '#eee' }}>
-							<Pressable onPress={() => eventBus.emit('openJoinGroup', item.join_code)}>
-								<Text>群組名稱：{item.name} </Text>
-								<Text>成員人數：{item.member_count}</Text>
-							</Pressable>
-						</View>
-					)}
-				/> */}
         </View >
     )
 }
