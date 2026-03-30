@@ -4,6 +4,16 @@ import { Discussion } from "@/types/supabase";
 import React, { useEffect, useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 
+const borderColors = [
+  "#60a5fa",
+  "#34d399",
+  "#fbbf24",
+  "#f472b6",
+  "#8b5cf6",
+  "#fb7185",
+  "#22c55e",
+];
+
 type DiscussionCardProps = {
   discussion: Discussion;
   isOpen: boolean;
@@ -48,20 +58,23 @@ export default function DiscussionCard({
     refetch();
   };
 
+  const borderColor =
+    borderColors[Number(discussion.id) % borderColors.length] ??
+    borderColors[0];
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { borderColor }]}>
       <Text style={styles.title}>{discussion.title}</Text>
       <Text style={styles.content}>{discussion.content}</Text>
 
       <View style={styles.metaRow}>
         <Text style={styles.metaText}>
-          {discussion.profiles?.username ?? "匿名"}
+          討論發起人：{discussion.profiles?.username ?? "匿名"}
         </Text>
         <Text style={styles.time}>
           {new Date(discussion.created_at).toLocaleString()}
         </Text>
       </View>
-
       <Text onPress={onToggle} style={styles.toggleText}>
         {isOpen ? "收合回覆" : `${comments.length} 則回覆`}
       </Text>
@@ -99,6 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
+    borderWidth: 2,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
@@ -107,13 +121,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: "400",
-    fontSize: 18,
+    fontSize: 24,
     marginBottom: 4,
     color: "#111827",
     lineHeight: 24,
   },
   content: {
-    color: "#374151",
+	fontSize: 20,
+    color: "#111827",
     marginBottom: 12,
   },
   metaRow: {
@@ -122,18 +137,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   metaText: {
-    fontSize: 12,
-    color: "#6b7280",
+    lineHeight: 24,
+    fontSize: 16,
+    color: "#111827",
   },
   time: {
-    fontSize: 13,
+    fontSize: 16,
     color: "#6b7280",
     fontWeight: "500",
   },
   toggleText: {
     color: "#4f46e5",
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 20,
     marginBottom: 12,
     textAlign: "right",
   },
