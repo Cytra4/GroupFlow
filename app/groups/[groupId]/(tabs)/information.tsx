@@ -36,8 +36,8 @@ export default function Information() {
 						<Text style={styles.title}>{groupData?.member_count}</Text>
 					</View>
 					<View style={styles.line} />
-					<View style={[styles.sectionContent, {alignItems: 'center'}]}>
-						<Text style={[styles.label, {alignSelf: 'flex-start'}]}>小組成員</Text>
+					<View style={[styles.sectionContent, { alignItems: 'center' }]}>
+						<Text style={[styles.label, { alignSelf: 'flex-start' }]}>小組成員</Text>
 						<FlatList
 							data={groupMembers}
 							key={"_"}
@@ -60,6 +60,13 @@ export default function Information() {
 							numColumns={3}
 						/>
 					</View>
+				</View>
+			</View>
+
+			<View style={styles.content}>
+				<Text style={styles.sectionTitle}>活動紀錄</Text>
+				<View style={styles.section}>
+
 				</View>
 			</View>
 		</View>
