@@ -1,8 +1,9 @@
 import CustomDay from '@/components/calendar/CustomDay';
+import GroupHeader from '@/components/GroupHeader';
 import { Loading } from '@/components/Loading';
 import { useTask } from '@/lib/hooks/useTask';
 import { Task } from '@/types/supabase';
-import { useGlobalSearchParams, useRouter } from 'expo-router';
+import { Tabs, useGlobalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CalendarList, LocaleConfig } from 'react-native-calendars';
@@ -87,69 +88,76 @@ export default function GroupCalendar() {
 	groupTasks = groupTasks?.filter(t => t.status == "unfinished")
 
 	if (isLoading) return (
-		<View style={[styles.container,{justifyContent: 'center', alignItems: 'center'}]}>
-			<Loading size={'large'}/>
+		<View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+			<Loading size={'large'} />
 		</View>
 	)
 
 	const taskEachDay = GetTasksForEachDay(groupTasks ?? []);
 
 	return (
-		<View style={styles.container}>
-			<CalendarList
-				style={styles.calendar}
-				pastScrollRange={12}
-				futureScrollRange={12}
-				monthFormat={'yyyy年 M月'}
-				theme={{
-					textMonthFontSize: 18,
-					textDayHeaderFontSize: 20,
-				}}
-
-				dayComponent={({ date, onPress, state }) => {
-					const dateString = date?.dateString ?? "";
-					const weekKey = getWeekKey(dateString);
-
-					const todayTasks = taskEachDay[dateString] ?? [];
-
-					const weekTasks = Object.entries(taskEachDay)
-						.filter(([d]) => getWeekKey(d) === weekKey)
-						.flatMap(([, tasks]) => tasks)
-						.map(t => t.task)
-						.filter(
-							(task, idx, arr) =>
-								arr.findIndex(t => t.id === task.id) === idx
-						);
-
-					const rowMap = new Map<number, number>();
-					let nextRow = 0;
-
-					weekTasks.forEach(task => {
-						rowMap.set(task.id, nextRow++);
-					});
-
-					const tasksWithRow = todayTasks.map(t => ({
-						...t,
-						rowIndex: rowMap.get(t.task.id)!,
-					}));
-
-					return (
-						<CustomDay
-							date={date}
-							onDayPress={() => {
-								router.replace({
-									pathname: '/groups/[groupId]/dayDetail/[date]',
-									params: {groupId, date: dateString}
-								})
-							}}
-							tasks={tasksWithRow}
-							maxRows={weekTasks.length}
-							dayState={state}
-						/>
-					);
+		<>
+			<Tabs.Screen
+				options={{
+					headerRight: () => <GroupHeader />,
 				}}
 			/>
-		</View>
+			<View style={styles.container}>
+				<CalendarList
+					style={styles.calendar}
+					pastScrollRange={12}
+					futureScrollRange={12}
+					monthFormat={'yyyy年 M月'}
+					theme={{
+						textMonthFontSize: 18,
+						textDayHeaderFontSize: 20,
+					}}
+
+					dayComponent={({ date, onPress, state }) => {
+						const dateString = date?.dateString ?? "";
+						const weekKey = getWeekKey(dateString);
+
+						const todayTasks = taskEachDay[dateString] ?? [];
+
+						const weekTasks = Object.entries(taskEachDay)
+							.filter(([d]) => getWeekKey(d) === weekKey)
+							.flatMap(([, tasks]) => tasks)
+							.map(t => t.task)
+							.filter(
+								(task, idx, arr) =>
+									arr.findIndex(t => t.id === task.id) === idx
+							);
+
+						const rowMap = new Map<number, number>();
+						let nextRow = 0;
+
+						weekTasks.forEach(task => {
+							rowMap.set(task.id, nextRow++);
+						});
+
+						const tasksWithRow = todayTasks.map(t => ({
+							...t,
+							rowIndex: rowMap.get(t.task.id)!,
+						}));
+
+						return (
+							<CustomDay
+								date={date}
+								onDayPress={() => {
+									router.replace({
+										pathname: '/groups/[groupId]/dayDetail/[date]',
+										params: { groupId, date: dateString }
+									})
+								}}
+								tasks={tasksWithRow}
+								maxRows={weekTasks.length}
+								dayState={state}
+							/>
+						);
+					}}
+				/>
+			</View>
+		</>
 	)
 }
 

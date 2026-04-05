@@ -1,8 +1,9 @@
+import GroupHeader from '@/components/GroupHeader';
 import TaskSection from '@/components/mission/TaskSection';
 import TaskCard from '@/components/TaskCard';
 import { useUserTasks } from '@/lib/hooks/useTask';
 import { getTaskTimeStatus } from '@/lib/utils/getTaskTimeStatus';
-import { useGlobalSearchParams } from 'expo-router';
+import { Tabs, useGlobalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
@@ -46,6 +47,12 @@ export default function Mission() {
 	);
 
 	return (
+		<>
+		<Tabs.Screen
+				options={{
+					headerRight: () => <GroupHeader />,
+				}}
+			/>
 		<ScrollView style={styles.scroll}>
 			<View style={styles.container}>
 				<TaskSection
@@ -109,6 +116,7 @@ export default function Mission() {
 				</TaskSection>
 			</View>
 		</ScrollView>
+		</>
 	)
 }
 
