@@ -1,9 +1,9 @@
-import { useAuth } from "@/scripts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase/client";
+import { useProfile } from "./auth/profile";
 
 export function useDeleteTask() {
-	const { user } = useAuth();
+	const profileQuery = useProfile();
 	const queryClient = useQueryClient()
 
 	return useMutation({
@@ -14,8 +14,6 @@ export function useDeleteTask() {
 			taskId: number,
 			groupId: string
 		}) => {
-
-			if (!user) return;
 
 			const { data: task, error: fetchError } = await supabase
 				.from("task")
@@ -29,7 +27,8 @@ export function useDeleteTask() {
 				.from("group_logs")
 				.insert({
 					group_id: groupId,
-					user_id: user.id,
+					user_id: profileQuery.data?.user_id,
+					username: profileQuery.data?.username,
 					action_type: "delete",
 					target_type: "task",
 					target_id: String(taskId),

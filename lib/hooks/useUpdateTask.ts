@@ -1,6 +1,6 @@
-import { useAuth } from "@/scripts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase/client";
+import { useProfile } from "./auth/profile";
 
 type UpdateTaskInput = {
 	taskId: number;
@@ -26,7 +26,7 @@ type FinishTaskInput = {
 
 //更新任務內容
 export function useUpdateTask() {
-	const { user } = useAuth();
+	const profileQuery = useProfile();
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -62,7 +62,8 @@ export function useUpdateTask() {
 				.from("group_logs")
 				.insert({
 					group_id: groupId,
-					user_id: user.id,
+					user_id: profileQuery.data?.user_id,
+					username: profileQuery.data?.username,
 					action_type: "update",
 					target_type: "task",
 					target_id: taskId,
@@ -138,7 +139,7 @@ export function useUpdateTaskMembers() {
 }
 
 export function useFinishTask() {
-	const { user } = useAuth();
+	const profileQuery = useProfile();
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -161,7 +162,8 @@ export function useFinishTask() {
 				.from("group_logs")
 				.insert({
 					group_id: groupId,
-					user_id: user.id,
+					user_id: profileQuery.data?.user_id,
+					username: profileQuery.data?.username,
 					action_type: "finish",
 					target_type: "task",
 					target_id: taskId,

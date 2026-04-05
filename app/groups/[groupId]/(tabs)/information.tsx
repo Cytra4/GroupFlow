@@ -1,3 +1,4 @@
+import LogDisplay from '@/components/LogDisplay';
 import { useGroup } from '@/lib/hooks/idk/useGroups';
 import { useGroupLogs } from '@/lib/hooks/useGroupLogs';
 import { useGroupMembers } from '@/lib/hooks/useGroupMembers';
@@ -68,7 +69,17 @@ export default function Information() {
 			<View style={styles.content}>
 				<Text style={styles.sectionTitle}>活動紀錄</Text>
 				<View style={styles.section}>
-
+					<FlatList
+						data={logData}
+						keyExtractor={item => item.id}
+						renderItem={({item, index}) => (
+							<LogDisplay
+								logData={item}
+							/>
+						)}
+						scrollEnabled={true}
+						style={styles.list}
+					/>
 				</View>
 			</View>
 		</View>
@@ -127,5 +138,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		paddingVertical: 8,
 		marginHorizontal: 8
+	},
+	list: {
+		maxHeight: 200
 	}
 })
