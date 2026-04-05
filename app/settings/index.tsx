@@ -1,4 +1,4 @@
-import { useLogout } from "@/lib/hooks/auth/user";
+import { useLogoutMutation } from "@/lib/hooks/auth/user";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import { ReactNode } from "react";
@@ -26,7 +26,7 @@ export default function SettingsIndex() {
                 </SettingsSection>
             ))}
 
-            <SettingsSection withIcon={false} onPress={useLogout().mutate}>
+            <SettingsSection withIcon={false} onPress={useLogoutMutation().mutate}>
                 <Text style={{ color: "coral" }}>登出</Text>
             </SettingsSection>
         </View>

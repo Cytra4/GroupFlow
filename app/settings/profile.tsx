@@ -1,5 +1,6 @@
 
 import { useProfile, useUpdateProfile } from "@/lib/hooks/auth/profile";
+import { useAvatarUpload } from "@/lib/hooks/utils/useAvatarUpload";
 import { Profile } from "@/types/supabase";
 import * as ImagePicker from "expo-image-picker";
 import { Stack } from "expo-router";
@@ -44,6 +45,10 @@ export default function ProfileSettings() {
         if (!profile) return;
         if (formDraft.username && !checkName(formDraft.username).valid) return;
         if (formDraft.phone && !checkPhone(formDraft.phone).valid) return;
+
+        if (modified.avatar && formDraft.avatarUrl) {
+            formDraft.avatarUrl = await useAvatarUpload(formDraft.avatarUrl, profile.user_id);
+        }
 
         updateProfile.mutate({ ...formDraft, user_id: profile.user_id }, {
             onSuccess: () => {

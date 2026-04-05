@@ -1,8 +1,18 @@
 import { supabase } from "@/lib/supabase/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+export const useUserQuery = () => {
+	return useQuery({
+		queryKey: ["user"],
+		queryFn: async () => {
+			const { data, error } = await supabase.auth.getUser();
+			if (error) throw error;
+			return data.user;
+		},
+	})
+}
 
-export const useLogout = () => {
+export const useLogoutMutation = () => {
 	const qc = useQueryClient();
 
 	return useMutation({
@@ -14,5 +24,19 @@ export const useLogout = () => {
 			qc.clear();
 		}
 	})
+}
+
+export const useVerifyPasswordMutation = () => {
+	const user = useUserQuery().data;
+	return useMutation({
+		mutationFn: async (password: string) => {
+			const { data, error } = await supabase.auth.signInWithPassword({
+				email: user!.email!,
+				password,
+			});
+			if (error) throw error;
+			return data;
+		},
+	});
 }
 

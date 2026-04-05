@@ -1,25 +1,24 @@
 import { supabase } from "@/lib/supabase/client";
 import { Profile } from "@/types/supabase";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAvatarUpload } from "../utils/useAvatarUpload";
+import { useUserQuery } from "./user";
 
 export type UserProfile = Profile & { email: string };
 
 export function useProfile() {
+	const user = useUserQuery().data;
+
 	return useQuery<UserProfile, Error>({
 		queryKey: ["profile"],
+		enabled: !!user,
 		queryFn: async () => {
-			const { data: userData, error: userError } = await supabase.auth.getUser();
-			if (userError) throw userError;
-
-			const { data: profile, error: profileError } = await supabase
+			const { data: profile, error: error } = await supabase
 				.from("profiles")
 				.select("*")
-				.eq("user_id", userData.user.id)
+				.eq("user_id", user!.id)
 				.single();
-
-			if (profileError) throw profileError;
-			return { ...profile, email: userData.user.email } as UserProfile;
+			if (error) throw error;
+			return { ...profile, email: user!.email } as UserProfile;
 		},
 	});
 }
@@ -29,9 +28,6 @@ export function useUpdateProfile() {
 
 	return useMutation({
 		mutationFn: async (updates: Partial<Profile> & { user_id: string }) => {
-			if (updates.avatarUrl) {
-				updates.avatarUrl = await useAvatarUpload(updates.avatarUrl, updates.user_id);
-			}
 			const { error } = await supabase
 				.from("profiles")
 				.update(updates)
