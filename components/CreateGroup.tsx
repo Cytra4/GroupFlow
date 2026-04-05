@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
 	button: {
 		borderRadius: 6,
 		paddingHorizontal: 25,
-		margin: 10
+		margin: 20
 	},
 	modalButton: {
 		borderRadius: 5,

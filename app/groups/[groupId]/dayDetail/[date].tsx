@@ -13,7 +13,7 @@ function GetTaskForToday(groupId: string, date: Date) {
 	taskData.forEach(element => {
 		const sDate = new Date(element['start_date']);
 		const dDate = new Date(element['due_date']);
-		if (date >= sDate && date <= dDate) result.push(element);
+		if (date >= sDate && date <= dDate && element.status == "unfinished") result.push(element);
 	});
 
 	result.sort((a,b) => a.priority - b.priority);

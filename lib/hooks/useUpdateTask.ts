@@ -1,3 +1,4 @@
+import { useAuth } from "@/scripts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase/client";
 
@@ -25,6 +26,7 @@ type FinishTaskInput = {
 
 //更新任務內容
 export function useUpdateTask() {
+	const { user } = useAuth();
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -55,6 +57,19 @@ export function useUpdateTask() {
 				.eq("id", taskId)
 
 			if (error) throw error;
+
+			const { error: logError} = await supabase
+				.from("group_logs")
+				.insert({
+					group_id: groupId,
+					user_id: user.id,
+					action_type: "update",
+					target_type: "task",
+					target_id: taskId,
+					content: taskTitle
+				})
+			
+			if (logError) throw logError;
 		},
 
 		onSuccess: (_, { groupId }) => {
@@ -123,6 +138,7 @@ export function useUpdateTaskMembers() {
 }
 
 export function useFinishTask() {
+	const { user } = useAuth();
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -136,8 +152,23 @@ export function useFinishTask() {
 					status: "finished",
 				})
 				.eq("id", taskId)
-				
+				.select("title")
+				.single();
+
 			if (error) throw error;
+
+			const { error: logError } = await supabase
+				.from("group_logs")
+				.insert({
+					group_id: groupId,
+					user_id: user.id,
+					action_type: "finish",
+					target_type: "task",
+					target_id: taskId,
+					content: data.title
+				})
+
+			if (logError) throw logError;
 		},
 
 		onSuccess: (_, { groupId }) => {

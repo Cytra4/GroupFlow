@@ -19,6 +19,7 @@ export function useAddNewTask() {
 
 		let taskStatus = "unfinished";
 
+		//Task
 		const { data: task, error: taskError } = await supabase
 			.from("task")
 			.insert({
@@ -36,6 +37,7 @@ export function useAddNewTask() {
 
 		if (taskError) throw taskError;
 
+		//Task Members
 		if (assignedUserIds.length > 0) {
 			const members = assignedUserIds.map((userId) => ({
 				group_id: groupID,
@@ -50,6 +52,20 @@ export function useAddNewTask() {
 
 			if (error) throw error;
 		}
+
+		//Log
+		const { error: logError } = await supabase
+		.from("group_logs")
+		.insert({
+			group_id: groupID,
+			user_id: user.id,
+			action_type: "create",
+			target_type: "task",
+			target_id: task.id,
+			content: title
+		})
+
+		if (logError) throw logError;
 
 		queryClient.invalidateQueries({
 			queryKey: ["task", groupID],
