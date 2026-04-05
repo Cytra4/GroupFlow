@@ -1,4 +1,3 @@
-import GroupHeader from "@/components/GroupHeader";
 import { PressableOpacity } from "@/components/PressableOpacity";
 import Feather from "@expo/vector-icons/Feather";
 import { Tabs, useRouter } from "expo-router";
@@ -22,7 +21,7 @@ export default function _layout() {
 						/>
 					</PressableOpacity>
 				),
-				headerRight: () => <GroupHeader />,
+				
 				tabBarItemStyle: {
 					width: "100%",
 					height: "100%",

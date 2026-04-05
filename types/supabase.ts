@@ -57,3 +57,14 @@ export type Discussion = {
     username: string | null;
   };
 };
+
+export type Group_Logs = {
+	id: string;
+	group_id: string;
+	user_id: string;
+	action_type: string;
+	target_type: string;
+	target_id: string;
+	content: string;
+	created_at: string;
+}

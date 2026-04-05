@@ -1,4 +1,5 @@
 import { useGroup } from '@/lib/hooks/idk/useGroups';
+import { useGroupLogs } from '@/lib/hooks/useGroupLogs';
 import { useGroupMembers } from '@/lib/hooks/useGroupMembers';
 import { useGlobalSearchParams } from 'expo-router';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
@@ -6,6 +7,7 @@ import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 export default function Information() {
 	const { groupId } = useGlobalSearchParams<{ groupId: string }>();
 	const { data: groupData } = useGroup(groupId);
+	const { data: logData } = useGroupLogs(groupId);
 	const { data: groupMembers } = useGroupMembers(groupId);
 	const creator = groupMembers?.find(
 		m => m.user_id === groupData?.created_by
