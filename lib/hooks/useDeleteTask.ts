@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase/client";
-import { useProfile } from "./auth/profile";
+import { useProfileQuery } from "./auth/profile";
 
 export function useDeleteTask() {
-	const profileQuery = useProfile();
+	const profileQuery = useProfileQuery();
 	const queryClient = useQueryClient()
 
 	return useMutation({

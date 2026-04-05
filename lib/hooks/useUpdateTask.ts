@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../supabase/client";
-import { useProfile } from "./auth/profile";
+import { useProfileQuery } from "./auth/profile";
 
 type UpdateTaskInput = {
 	taskId: number;
@@ -26,7 +26,7 @@ type FinishTaskInput = {
 
 //更新任務內容
 export function useUpdateTask() {
-	const profileQuery = useProfile();
+	const profileQuery = useProfileQuery();
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -139,7 +139,7 @@ export function useUpdateTaskMembers() {
 }
 
 export function useFinishTask() {
-	const profileQuery = useProfile();
+	const profileQuery = useProfileQuery();
 	const queryClient = useQueryClient();
 
 	return useMutation({

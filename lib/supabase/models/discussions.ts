@@ -1,4 +1,4 @@
-import { useProfile } from "@/lib/hooks/auth/profile";
+import { useProfileQuery } from "@/lib/hooks/auth/profile";
 import { useAuth } from "@/scripts/AuthContext";
 import { Discussion } from "@/types/supabase";
 import { useFetch, useInsert } from "../query";
@@ -24,7 +24,7 @@ export function useDiscussions(groupId: string | undefined) {
 
 export function useAddDiscussion() {
 	const { user } = useAuth();
-	const profileQuery = useProfile();
+	const profileQuery = useProfileQuery();
 	const insertMutation = useInsert<Discussion>();
 
 	const addDiscussion = async (

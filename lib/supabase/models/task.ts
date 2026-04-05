@@ -1,11 +1,11 @@
-import { useProfile } from "@/lib/hooks/auth/profile";
+import { useProfileQuery } from "@/lib/hooks/auth/profile";
 import { useAuth } from "@/scripts/AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../client";
 
 export function useAddNewTask() {
 	const { user } = useAuth();
-	const profileQuery = useProfile();
+	const profileQuery = useProfileQuery();
 	const queryClient = useQueryClient();
 
 	const addTask = async (
