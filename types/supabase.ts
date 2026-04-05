@@ -10,20 +10,12 @@ export type Comment = {
   };
 };
 export type Profile = {
-<<<<<<< HEAD
 	user_id: string;
 	username: string;
 	role: string;
 	phone?: string;
 	avatarUrl?: string;
 	created_at: string;
-=======
-  user_id: string;
-  username: string;
-  role: string;
-  phone?: string;
-  created_at: string;
->>>>>>> 52b46bbc439e967f16044efba83257fa7f6b6ef1
 };
 
 export type Group = {
