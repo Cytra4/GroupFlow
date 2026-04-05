@@ -1,5 +1,5 @@
 
-import { useProfile, useUpdateProfile } from "@/lib/hooks/auth/profile";
+import { useProfileQuery, useUpdateProfileMutation } from "@/lib/hooks/auth/profile";
 import { useAvatarUpload } from "@/lib/hooks/utils/useAvatarUpload";
 import { Profile } from "@/types/supabase";
 import * as ImagePicker from "expo-image-picker";
@@ -9,8 +9,8 @@ import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-nativ
 
 
 export default function ProfileSettings() {
-    const { data: profile } = useProfile();
-    const updateProfile = useUpdateProfile();
+    const { data: profile } = useProfileQuery();
+    const updateProfile = useUpdateProfileMutation();
 
     const [formDraft, setFormDraft] = React.useState<Partial<Profile>>({});
     const [modified, setModified] = React.useState({ avatar: false, form: false });

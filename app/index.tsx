@@ -1,6 +1,6 @@
 import CreateGroup from '@/components/CreateGroup';
 import { GroupCard } from '@/components/GroupCard';
-import { useProfile } from '@/lib/hooks/auth/profile';
+import { useProfileQuery } from '@/lib/hooks/auth/profile';
 import { useUserGroups } from '@/lib/hooks/idk/useGroups';
 import { wp } from '@/scripts/constants';
 import { useRouter } from 'expo-router';
@@ -10,7 +10,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 export default function Index() {
     const router = useRouter();
 
-    const profileQuery = useProfile();
+    const profileQuery = useProfileQuery();
     const { data: userGroups } = useUserGroups(profileQuery.data?.user_id ?? "");
 
     //根據小組名稱生成header顏色

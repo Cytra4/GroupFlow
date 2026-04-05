@@ -5,8 +5,8 @@ import { useUserQuery } from "./user";
 
 export type UserProfile = Profile & { email: string };
 
-export function useProfile() {
-	const user = useUserQuery().data;
+export function useProfileQuery() {
+	const { data: user } = useUserQuery();
 
 	return useQuery<UserProfile, Error>({
 		queryKey: ["profile"],
@@ -23,7 +23,7 @@ export function useProfile() {
 	});
 }
 
-export function useUpdateProfile() {
+export function useUpdateProfileMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({

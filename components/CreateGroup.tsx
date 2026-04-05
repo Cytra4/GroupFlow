@@ -1,4 +1,4 @@
-import { useProfile } from "@/lib/hooks/auth/profile";
+import { useProfileQuery } from "@/lib/hooks/auth/profile";
 import { useInsert } from "@/lib/supabase/query";
 import { hp } from "@/scripts/constants";
 import { useQueryClient } from '@tanstack/react-query';
@@ -11,7 +11,7 @@ export default function CreateGroup() {
 	const [groupName, setGroupName] = useState<string>("");
 	const [error, setError] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
-	const profileQuery = useProfile();
+	const profileQuery = useProfileQuery();
 	const queryClient = useQueryClient();
 	const groupInsertMutation = useInsert();
 

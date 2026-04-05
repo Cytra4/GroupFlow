@@ -14,7 +14,7 @@ export type GroupMember = {
 
 export function useGroupMembers(groupId: string) {
 	return useQuery<GroupMember[], Error>({
-		queryKey: ["group-members", groupId],
+		queryKey: ["group_members", groupId],
 		enabled: !!groupId,
 		queryFn: async () => {
 			const { data, error } = await supabase
