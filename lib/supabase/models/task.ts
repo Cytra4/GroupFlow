@@ -1,9 +1,11 @@
+import { useProfileQuery } from "@/lib/hooks/auth/profile";
 import { useAuth } from "@/scripts/AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../client";
 
 export function useAddNewTask() {
 	const { user } = useAuth();
+	const profileQuery = useProfileQuery();
 	const queryClient = useQueryClient();
 
 	const addTask = async (
@@ -58,7 +60,8 @@ export function useAddNewTask() {
 		.from("group_logs")
 		.insert({
 			group_id: groupID,
-			user_id: user.id,
+			user_id: profileQuery.data?.user_id,
+			username: profileQuery.data?.username,
 			action_type: "create",
 			target_type: "task",
 			target_id: task.id,

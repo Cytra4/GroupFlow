@@ -62,6 +62,7 @@ export type Group_Logs = {
 	id: string;
 	group_id: string;
 	user_id: string;
+	username: string;
 	action_type: string;
 	target_type: string;
 	target_id: string;

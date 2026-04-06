@@ -46,78 +46,78 @@ export default function Mission() {
         t => t.status === "finished"
     );
 
-    return (
-        <>
-            <Tabs.Screen
-                options={{
-                    headerRight: () => <GroupHeader />,
-                }}
-            />
-            <ScrollView style={styles.scroll}>
-                <View style={styles.container}>
-                    <TaskSection
-                        title='未開始'
-                        count={todoTasks?.length ?? 0}
-                        isOpen={open["todo"]}
-                        onToggle={() => toggle("todo")}
-                    >
-                        {todoTasks?.map((task) => (
-                            <TaskCard
-                                key={task.id}
-                                taskData={task}
-                                mode="Editable"
-                            />
-                        ))}
-                    </TaskSection>
+	return (
+		<>
+			<Tabs.Screen
+				options={{
+					headerRight: () => <GroupHeader />,
+				}}
+			/>
+			<ScrollView style={styles.scroll}>
+				<View style={styles.container}>
+					<TaskSection
+						title='未開始'
+						count={todoTasks?.length ?? 0}
+						isOpen={open["todo"]}
+						onToggle={() => toggle("todo")}
+					>
+						{todoTasks?.map((task) => (
+							<TaskCard
+								key={task.id}
+								taskData={task}
+								mode="Editable"
+							/>
+						))}
+					</TaskSection>
 
-                    <TaskSection
-                        title='進行中'
-                        count={ongoingTasks?.length ?? 0}
-                        isOpen={open["ongoing"]}
-                        onToggle={() => toggle("ongoing")}
-                    >
-                        {ongoingTasks?.map((task) => (
-                            <TaskCard
-                                key={task.id}
-                                taskData={task}
-                                mode="Editable"
-                            />
-                        ))}
-                    </TaskSection>
+					<TaskSection
+						title='進行中'
+						count={ongoingTasks?.length ?? 0}
+						isOpen={open["ongoing"]}
+						onToggle={() => toggle("ongoing")}
+					>
+						{ongoingTasks?.map((task) => (
+							<TaskCard
+								key={task.id}
+								taskData={task}
+								mode="Editable"
+							/>
+						))}
+					</TaskSection>
 
-                    <TaskSection
-                        title='已結束'
-                        count={endTasks?.length ?? 0}
-                        isOpen={open["end"]}
-                        onToggle={() => toggle("end")}
-                    >
-                        {endTasks?.map((task) => (
-                            <TaskCard
-                                key={task.id}
-                                taskData={task}
-                                mode="Editable"
-                            />
-                        ))}
-                    </TaskSection>
+					<TaskSection
+						title='已結束'
+						count={endTasks?.length ?? 0}
+						isOpen={open["end"]}
+						onToggle={() => toggle("end")}
+					>
+						{endTasks?.map((task) => (
+							<TaskCard
+								key={task.id}
+								taskData={task}
+								mode="Editable"
+							/>
+						))}
+					</TaskSection>
 
-                    <TaskSection
-                        title='已完成'
-                        count={completedTasks?.length ?? 0}
-                        isOpen={open["complete"]}
-                        onToggle={() => toggle("complete")}
-                    >
-                        {completedTasks?.map((task) => (
-                            <TaskCard
-                                key={task.id}
-                                taskData={task}
-                                mode="Finished"
-                            />
-                        ))}
-                    </TaskSection>
-                </View>
-            </ScrollView>
-        </>
-    )
+					<TaskSection
+						title='已完成'
+						count={completedTasks?.length ?? 0}
+						isOpen={open["complete"]}
+						onToggle={() => toggle("complete")}
+					>
+						{completedTasks?.map((task) => (
+							<TaskCard
+								key={task.id}
+								taskData={task}
+								mode="Finished"
+							/>
+						))}
+					</TaskSection>
+				</View>
+			</ScrollView>
+		</>
+	)
 }
 
 const styles = StyleSheet.create({

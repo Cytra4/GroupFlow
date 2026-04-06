@@ -1,3 +1,4 @@
+import LogDisplay from '@/components/LogDisplay';
 import { useGroup } from '@/lib/hooks/idk/useGroups';
 import { useGroupLogs } from '@/lib/hooks/useGroupLogs';
 import { useGroupMembers } from '@/lib/hooks/useGroupMembers';
@@ -70,6 +71,7 @@ export default function Information() {
                 </View>
             </View>
 
+<<<<<<< HEAD
             <View style={styles.content}>
                 <Text style={styles.sectionTitle}>活動紀錄</Text>
                 <View style={styles.section}>
@@ -133,4 +135,82 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         marginHorizontal: 8
     }
+=======
+			<View style={styles.content}>
+				<Text style={styles.sectionTitle}>活動紀錄</Text>
+				<View style={styles.section}>
+					<FlatList
+						data={logData}
+						keyExtractor={item => item.id}
+						renderItem={({item, index}) => (
+							<LogDisplay
+								logData={item}
+							/>
+						)}
+						scrollEnabled={true}
+						style={styles.list}
+					/>
+				</View>
+			</View>
+		</View>
+	)
+}
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		backgroundColor: "#f2f5f8",
+		alignItems: 'center',
+		padding: 8
+	},
+	content: {
+		width: '85%',
+	},
+	section: {
+		backgroundColor: 'white',
+		paddingVertical: 10,
+		borderWidth: 1.5,
+		borderColor: '#bfc9d1',
+		borderRadius: 6
+	},
+	sectionTitle: {
+		fontSize: 18,
+		fontWeight: '500',
+		marginTop: 16,
+		marginBottom: 10,
+		alignSelf: 'flex-start',
+	},
+	sectionContent: {
+		paddingHorizontal: 15,
+	},
+	label: {
+		color: 'gray',
+		marginBottom: 3,
+		fontSize: 14
+	},
+	title: {
+		fontSize: 16
+	},
+	line: {
+		width: '100%',
+		borderTopWidth: 1,
+		borderColor: '#bfc9d1',
+		marginVertical: 10,
+	},
+	profilePic: {
+		width: 25,
+		height: 25,
+		borderRadius: 65,
+		marginRight: 8
+	},
+	memberRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		paddingVertical: 8,
+		marginHorizontal: 8
+	},
+	list: {
+		maxHeight: 200
+	}
+>>>>>>> 031c28ae68599ae7eeb0e6d0266cc79858479a3a
 })

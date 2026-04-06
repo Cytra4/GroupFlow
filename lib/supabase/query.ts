@@ -84,7 +84,7 @@ export function useInsert<T>() {
 			return (data ?? []) as T[];
 		},
 		onSuccess: (_, { table }) => {
-			queryClient.invalidateQueries({ queryKey: [table] });
+			queryClient.invalidateQueries({ queryKey: ["fetch", table] });
 		},
 	});
 }
