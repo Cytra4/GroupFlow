@@ -23,3 +23,20 @@ export function useLeaveGroupMutation() {
 		}
 	});
 }
+
+export function useDeleteGroupMutation() {
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (groupId: string) => {
+			const { error } = await supabase
+				.from("groups")
+				.delete()
+				.eq("id", groupId);
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: ["groups"] });
+		}
+	});
+}

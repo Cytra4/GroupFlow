@@ -12,11 +12,15 @@ export type Comment = {
 export type Profile = {
 	user_id: string;
 	username: string;
-	role: string;
+	role: UserRole;
 	phone?: string;
 	avatarUrl?: string;
 	created_at: string;
 };
+export enum UserRole {
+	User = "user",
+	Admin = "admin"
+}
 
 export type Group = {
   id: string;

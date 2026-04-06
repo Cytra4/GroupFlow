@@ -71,7 +71,7 @@ export function useAddNewTask() {
 		if (logError) throw logError;
 
 		queryClient.invalidateQueries({
-			queryKey: ["task", groupID],
+			queryKey: ["tasks", groupID],
 		});
 
 		return task;

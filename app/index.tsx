@@ -1,17 +1,17 @@
 import CreateGroup from '@/components/CreateGroup';
 import { GroupCard } from '@/components/GroupCard';
-import { useProfileQuery } from '@/lib/hooks/auth/profile';
+import JoinGroup from '@/components/JoinGroup';
 import { useUserGroups } from '@/lib/hooks/idk/useGroups';
 import { wp } from '@/scripts/constants';
-import { useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
+import { Stack, useRouter } from 'expo-router';
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 export default function Index() {
     const router = useRouter();
 
-    const profileQuery = useProfileQuery();
-    const { data: userGroups } = useUserGroups(profileQuery.data?.user_id ?? "");
+    const { data: userGroups } = useUserGroups();
 
     //根據小組名稱生成header顏色
     function GenColorFromName(group_name: string) {
@@ -23,12 +23,17 @@ export default function Index() {
         return `hsl(${hue}, 70%, 60%)`;
     }
 
-    return (
+    return (<>
+        <Stack.Screen
+            options={{
+                headerRight: () => <IndexHeader />
+            }}
+        />
         <View style={styles.container}>
-			<CreateGroup />
+            <CreateGroup />
 
             <FlatList
-				showsVerticalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
                 data={userGroups}
                 style={{ width: wp(80) }}
                 keyExtractor={(group) => group.id}
@@ -49,7 +54,7 @@ export default function Index() {
                 )}
             />
         </View >
-    )
+    </>)
 }
 
 const styles = StyleSheet.create({
@@ -60,3 +65,19 @@ const styles = StyleSheet.create({
         backgroundColor: "#f2f5f8",
     },
 })
+
+function IndexHeader() {
+    const router = useRouter();
+
+    return (
+        <>
+            <JoinGroup />
+            <Feather
+                name="settings"
+                size={24}
+                style={{ marginRight: 16 }}
+                onPress={() => { router.push('/settings'); }}
+            />
+        </>
+    );
+}

@@ -32,7 +32,7 @@ export default function CreateGroup() {
 				}
 			});
 
-			queryClient.invalidateQueries({ queryKey: ['groups', profileQuery.data?.user_id] });
+			queryClient.invalidateQueries({ queryKey: ['groups'] });
 			setGroupName("");
 			setVisible(false);
 		}

@@ -1,4 +1,3 @@
-import IndexHeader from "@/components/IndexHeader";
 import { queryClient } from "@/lib/queryClient";
 import { supabase } from "@/lib/supabase/client";
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -53,7 +52,7 @@ function RootLayout() {
                     headerShown: true,
                     headerTitle: "我的小組",
                     headerTitleAlign: "center",
-                    headerRight: () => <IndexHeader />
+                    // headerRight: () => <IndexHeader />
                 }}
             />
 

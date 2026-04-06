@@ -21,7 +21,7 @@ export function useTask(group_id: string) {
 
 export function useUserTasks(group_id: string) {
 	return useQuery<Task[], Error>({
-		queryKey: ["user_tasks", group_id],
+		queryKey: ["tasks", group_id],
 		enabled: !!group_id,
 		queryFn: async () => {
 
