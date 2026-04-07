@@ -7,6 +7,7 @@ export function useComments(discussionId: number) {
       id,
       discussion_id,
       content,
+      avatarUrl,
       created_at,
       profiles (
         username
@@ -22,12 +23,17 @@ export function useComments(discussionId: number) {
 export function useAddComment() {
   const insertMutation = useInsert();
 
-  const addComment = (discussionId: number, content: string) => {
+  const addComment = (
+    discussionId: number,
+    content: string | null,
+    avatarUrl?: string,
+  ) => {
     insertMutation.mutate({
       table: "comments",
       row: {
         discussion_id: discussionId,
         content,
+        avatarUrl: avatarUrl,
         status: true,
       },
     });

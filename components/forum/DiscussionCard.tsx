@@ -1,8 +1,19 @@
+import { useAvatarUpload } from "@/lib/hooks/utils/useAvatarUpload";
 import { supabase } from "@/lib/supabase/client";
 import { useAddComment, useComments } from "@/lib/supabase/models/comments";
 import { Discussion } from "@/types/supabase";
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+	Button,
+	Image,
+	Modal,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
+} from "react-native";
 
 const borderColors = [
   "#60a5fa",
@@ -28,6 +39,13 @@ export default function DiscussionCard({
   const { comments = [], refetch } = useComments(discussion.id);
   const { addComment } = useAddComment();
   const [replyText, setReplyText] = useState("");
+  const [replyImageUri, setReplyImageUri] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImageUri, setSelectedImageUri] = useState("");
+  const uploadavatar = useAvatarUpload(
+    replyImageUri,
+    `comment_${discussion.id}_${Date.now()}`,
+  );
 
   useEffect(() => {
     const channel = supabase
@@ -51,11 +69,35 @@ export default function DiscussionCard({
     };
   }, [discussion.id, refetch]);
 
-  const handleAddReply = () => {
-    if (!replyText.trim()) return;
-    addComment(discussion.id, replyText);
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setReplyImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleAddReply = async () => {
+    if (!replyText.trim() && !replyImageUri) return;
+
+    let avatarUrl: string | undefined;
+    if (replyImageUri) {
+      avatarUrl = await uploadavatar;
+    }
+
+    addComment(discussion.id, replyText.trim() || null, avatarUrl);
     setReplyText("");
+    setReplyImageUri("");
     refetch();
+  };
+  const openImageModal = (uri: string) => {
+    setSelectedImageUri(uri);
+    setModalVisible(true);
   };
 
   const borderColor =
@@ -87,6 +129,16 @@ export default function DiscussionCard({
                 {comment.profiles?.username ?? "匿名"}
               </Text>
               <Text style={styles.commentContent}>{comment.content}</Text>
+              {comment.avatarUrl ? (
+                <TouchableOpacity
+                  onPress={() => openImageModal(comment.avatarUrl!)}
+                >
+                  <Image
+                    source={{ uri: comment.avatarUrl }}
+                    style={styles.commentImage}
+                  />
+                </TouchableOpacity>
+              ) : null}
               <Text style={styles.commentTime}>
                 {new Date(comment.created_at).toLocaleString()}
               </Text>
@@ -99,9 +151,41 @@ export default function DiscussionCard({
             placeholder="輸入回覆..."
             style={styles.replyInput}
           />
+          <View style={styles.uploadRow}>
+            <Button title="選擇圖片" onPress={handlePickImage} />
+            {replyImageUri ? (
+              <Button title="移除圖片" onPress={() => setReplyImageUri("")} />
+            ) : null}
+          </View>
+          {replyImageUri ? (
+            <TouchableOpacity onPress={() => openImageModal(replyImageUri)}>
+              <Image
+                source={{ uri: replyImageUri }}
+                style={styles.replyPreview}
+              />
+            </TouchableOpacity>
+          ) : null}
           <Button title="送出回覆" onPress={handleAddReply} />
         </View>
       )}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalBackground}
+          activeOpacity={1}
+          onPress={() => setModalVisible(false)}
+        >
+          <Image
+            source={{ uri: selectedImageUri }}
+            style={styles.modalImage}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -127,7 +211,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   content: {
-	fontSize: 20,
+    fontSize: 20,
     color: "#111827",
     marginBottom: 12,
   },
@@ -181,5 +265,34 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 8,
     marginBottom: 8,
+  },
+  uploadRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  replyPreview: {
+    width: "100%",
+    height: 180,
+    borderRadius: 10,
+    marginBottom: 8,
+  },
+  commentImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginTop: 6,
+    marginBottom: 6,
+    resizeMode: "contain",
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalImage: {
+    width: "90%",
+    height: "90%",
   },
 });

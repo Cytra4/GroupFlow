@@ -2,7 +2,8 @@ export type Comment = {
   id: number;
   discussion_id: number;
   user_id: string;
-  content: string | null;
+  content: string ;
+  avatarUrl?: string ;
   status: boolean | null;
   created_at: string;
   profiles?: {
@@ -10,16 +11,16 @@ export type Comment = {
   };
 };
 export type Profile = {
-	user_id: string;
-	username: string;
-	role: UserRole;
-	phone?: string;
-	avatarUrl?: string;
-	created_at: string;
+  user_id: string;
+  username: string;
+  role: UserRole;
+  phone?: string;
+  avatarUrl?: string;
+  created_at: string;
 };
 export enum UserRole {
-	User = "user",
-	Admin = "admin"
+  User = "user",
+  Admin = "admin",
 }
 
 export type Group = {
@@ -63,13 +64,13 @@ export type Discussion = {
 };
 
 export type Group_Logs = {
-	id: string;
-	group_id: string;
-	user_id: string;
-	username: string;
-	action_type: string;
-	target_type: string;
-	target_id: string;
-	content: string;
-	created_at: string;
-}
+  id: string;
+  group_id: string;
+  user_id: string;
+  username: string;
+  action_type: string;
+  target_type: string;
+  target_id: string;
+  content: string;
+  created_at: string;
+};
