@@ -5,9 +5,9 @@ import { Discussion } from "@/types/supabase";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
-	Button,
 	Image,
 	Modal,
+	Pressable,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -152,9 +152,16 @@ export default function DiscussionCard({
             style={styles.replyInput}
           />
           <View style={styles.uploadRow}>
-            <Button title="選擇圖片" onPress={handlePickImage} />
+            <Pressable style={styles.uploadButton} onPress={handlePickImage}>
+              <Text style={styles.ButtonText}>選擇圖片</Text>
+            </Pressable>
             {replyImageUri ? (
-              <Button title="移除圖片" onPress={() => setReplyImageUri("")} />
+              <Pressable
+                style={styles.cancelButton}
+                onPress={() => setReplyImageUri("")}
+              >
+                <Text>移除圖片</Text>
+              </Pressable>
             ) : null}
           </View>
           {replyImageUri ? (
@@ -165,7 +172,9 @@ export default function DiscussionCard({
               />
             </TouchableOpacity>
           ) : null}
-          <Button title="送出回覆" onPress={handleAddReply} />
+          <Pressable style={styles.submitButton} onPress={handleAddReply}>
+            <Text style={styles.ButtonText}>送出回覆</Text>
+          </Pressable>
         </View>
       )}
       <Modal
@@ -263,7 +272,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 6,
-    padding: 8,
+    padding: 15,
     marginBottom: 8,
   },
   uploadRow: {
@@ -294,5 +303,34 @@ const styles = StyleSheet.create({
   modalImage: {
     width: "90%",
     height: "90%",
+  },
+  uploadButton: {
+    backgroundColor: "#4f46e5",
+    color: "#fff",
+    fontWeight: "700",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  cancelButton: {
+    backgroundColor: "#e5e7eb",
+    color: "#374151",
+    fontWeight: "700",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  submitButton: {
+    backgroundColor: "#4f46e5",
+    color: "#fff",
+    fontWeight: "700",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    borderRadius: 16,
+  },
+  ButtonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });
