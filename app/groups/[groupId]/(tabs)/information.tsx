@@ -135,6 +135,7 @@ export default function Information() {
 						renderItem={({ item, index }) => (
 							<LogDisplay
 								logData={item}
+								isGroupRelated={item.target_type == "group"}
 							/>
 						)}
 						scrollEnabled={true}

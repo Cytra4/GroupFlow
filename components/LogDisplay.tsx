@@ -2,7 +2,7 @@ import { Group_Logs } from "@/types/supabase";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function LogDisplay(
-	{ logData }: { logData: Group_Logs }
+	{ logData, isGroupRelated}: { logData: Group_Logs, isGroupRelated: boolean }
 ) {
 
 	function getActionText(action_type: string) {
@@ -47,7 +47,9 @@ export default function LogDisplay(
 		result += logData.username + " ";
 		result += getActionText(logData.action_type);
 		result += getTargetText(logData.target_type);
-		result += "「" + logData.content + "」";
+		if (!isGroupRelated){
+			result += "「" + logData.content + "」";
+		}
 		return result;
 	}
 
