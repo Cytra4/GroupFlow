@@ -18,6 +18,12 @@ export default function LogDisplay(
 		else if (action_type == "finish") {
 			return "完成了";
 		}
+		else if (action_type == "leave") {
+			return "離開了";
+		}
+		else if (action_type == "join") {
+			return "加入了";
+		}
 		else {
 			return "進行了操作";
 		}
@@ -29,6 +35,9 @@ export default function LogDisplay(
 		}
 		else if (target_type == "discussion"){
 			return "討論串";
+		}
+		else if (target_type == "group"){
+			return "小組";
 		}
 		return "";
 	}

@@ -1,8 +1,11 @@
+import { useProfileQuery } from '@/lib/hooks/auth/profile';
 import { queryClient } from '@/lib/queryClient';
 import { supabase } from '@/lib/supabase/client';
 import { useMutation } from '@tanstack/react-query';
 
 export function useJoinGroup() {
+	const profileQuery = useProfileQuery();
+
 	return useMutation({
 		mutationFn: async ({ groupCode }: { groupCode: string }) => {
 			// 取得使用者
@@ -14,7 +17,7 @@ export function useJoinGroup() {
 			// 查詢群組
 			const { data: group, error: groupError } = await supabase
 				.from('groups')
-				.select('id, join_code')
+				.select('id, join_code, name')
 				.eq('join_code', groupCode)
 				.single();
 			if (groupError || !group)
@@ -30,10 +33,23 @@ export function useJoinGroup() {
 				throw new Error("你已經加入過這個小組了");
 			if (insertError) throw insertError;
 
+			const { error: logError } = await supabase
+			.from("group_logs")
+			.insert({
+				group_id: group.id,
+				user_id: userId,
+				username: profileQuery.data?.username,
+				action_type: "join",
+				target_type: "group",
+				target_id: group.id,
+				content: group.name
+			});
+			if (logError) throw logError;
+
 			return group;
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["fetch", 'groups'] });
+			queryClient.invalidateQueries({ queryKey: ["groups"] });
 		},
 	});
 }
