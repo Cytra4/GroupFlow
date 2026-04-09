@@ -42,10 +42,10 @@ export default function DiscussionCard({
   const [replyImageUri, setReplyImageUri] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState("");
-  const uploadavatar = useAvatarUpload(
+  const uploadavatar = replyImageUri ? useAvatarUpload(
     replyImageUri,
     `comment_${discussion.id}_${Date.now()}`,
-  );
+  ) : null;
 
   useEffect(() => {
     const channel = supabase
@@ -86,7 +86,7 @@ export default function DiscussionCard({
     if (!replyText.trim() && !replyImageUri) return;
 
     let avatarUrl: string | undefined;
-    if (replyImageUri) {
+    if (replyImageUri && uploadavatar) {
       avatarUrl = await uploadavatar;
     }
 
