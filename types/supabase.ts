@@ -8,6 +8,7 @@ export type Comment = {
   created_at: string;
   profiles?: {
     username: string | null;
+	avatarUrl?: string;
   };
 };
 export type Profile = {
@@ -58,8 +59,10 @@ export type Discussion = {
   content: string;
   status: boolean;
   created_at: string;
+  avatarUrl?: string;
   profiles?: {
     username: string | null;
+	avatarUrl?: string;
   };
 };
 

@@ -1,9 +1,14 @@
 import { useUserTasks } from '@/lib/hooks/useTask';
+import { useAvatarUpload } from "@/lib/hooks/utils/useAvatarUpload";
 import { useAddDiscussion } from "@/lib/supabase/models/discussions";
+import { useAuth } from "@/scripts/AuthContext";
+import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import {
+	Image,
 	Modal,
 	Pressable,
+	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -64,13 +69,18 @@ export default function AddDiscussion({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const [imageUri, setImageUri] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const { addDiscussion, isPending } = useAddDiscussion();
   const { data: taskData = [] } = useUserTasks(groupId ?? "");
+  const { user } = useAuth();
 
   const handleClose = () => {
     setTitle("");
     setContent("");
     setSelectedTaskIds([]);
+    setImageUri("");
+    setIsUploading(false);
     onClose();
   };
 
@@ -82,22 +92,51 @@ export default function AddDiscussion({
     );
   };
 
-  const handleSubmit = () => {
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleSubmit = async () => {
     if (!groupId || !title.trim() || !content.trim()) return;
 
-    const selectedTasks = taskData
-      .filter((task) => selectedTaskIds.includes(task.id))
-      .map((task) => task.title);
+    try {
+      setIsUploading(true);
+      let avatarUrl: string | undefined;
 
-    const finalContent = selectedTasks.length
-      ? `${content.trim()}\n\n相關任務：\n- ${selectedTasks.join("\n- ")}`
-      : content.trim();
+      // Upload image if selected
+      if (imageUri && user) {
+        avatarUrl = await useAvatarUpload(
+          imageUri,
+          `discussion_${Date.now()}`
+        );
+      }
 
-    addDiscussion(groupId, title.trim(), finalContent);
-    setTitle("");
-    setContent("");
-    setSelectedTaskIds([]);
-    onAdded?.();
+      const selectedTasks = taskData
+        .filter((task) => selectedTaskIds.includes(task.id))
+        .map((task) => task.title);
+
+      const finalContent = selectedTasks.length
+        ? `${content.trim()}\n\n相關任務：\n- ${selectedTasks.join("\n- ")}`
+        : content.trim();
+
+      addDiscussion(groupId, title.trim(), finalContent, avatarUrl);
+      setTitle("");
+      setContent("");
+      setSelectedTaskIds([]);
+      setImageUri("");
+      onAdded?.();
+    } finally {
+      setIsUploading(false);
+    }
     onClose();
   };
 
@@ -110,74 +149,107 @@ export default function AddDiscussion({
     >
       <Pressable style={styles.modalOverlay} onPress={handleClose}>
         <Pressable style={styles.modalView} onPress={() => null}>
-          <Text style={styles.modalTitle}>新增討論</Text>
+          <ScrollView>
+            <Text style={styles.modalTitle}>新增討論</Text>
 
-          <TextInput
-            placeholder="標題"
-            value={title}
-            onChangeText={setTitle}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="內容"
-            value={content}
-            onChangeText={setContent}
-            style={[styles.input, styles.textarea]}
-            multiline
-          />
+            <TextInput
+              placeholder="標題"
+              value={title}
+              onChangeText={setTitle}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="內容"
+              value={content}
+              onChangeText={setContent}
+              style={[styles.input, styles.textarea]}
+              multiline
+            />
 
-          <View style={styles.taskSection}>
-            <Text style={styles.sectionTitle}>選擇相關任務</Text>
-            {taskData.length === 0 ? (
-              <Text style={styles.emptyText}>沒有可用任務</Text>
-            ) : (
-              taskData.map((task, index) => {
-                const selected = selectedTaskIds.includes(task.id);
-                const colors = taskColors[index % taskColors.length];
-                return (
+            {/* Image Upload Section */}
+            <View style={styles.imageSection}>
+              <Text style={styles.sectionTitle}>添加圖片</Text>
+              {imageUri ? (
+                <View>
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={styles.imagePreview}
+                  />
                   <Pressable
-                    key={task.id}
-                    style={[
-                      styles.taskItem,
-                      {
-                        borderColor: selected
-                          ? colors.selectedBorder
-                          : colors.borderColor,
-                        backgroundColor: selected
-                          ? colors.selectedBackground
-                          : colors.backgroundColor,
-                      },
-                    ]}
-                    onPress={() => handleToggleTask(task.id)}
+                    style={styles.removeImageButton}
+                    onPress={() => setImageUri("")}
                   >
-                    <View
+                    <Text style={styles.removeImageText}>移除圖片</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <Pressable
+                  style={styles.uploadImageButton}
+                  onPress={handlePickImage}
+                >
+                  <Text style={styles.uploadImageText}>選擇圖片</Text>
+                </Pressable>
+              )}
+            </View>
+
+            <View style={styles.taskSection}>
+              <Text style={styles.sectionTitle}>選擇相關任務</Text>
+              {taskData.length === 0 ? (
+                <Text style={styles.emptyText}>沒有可用任務</Text>
+              ) : (
+                taskData.map((task, index) => {
+                  const selected = selectedTaskIds.includes(task.id);
+                  const colors = taskColors[index % taskColors.length];
+                  return (
+                    <Pressable
+                      key={task.id}
                       style={[
-                        styles.checkbox,
-                        selected && {
-                          backgroundColor: colors.checkboxColor,
-                          borderColor: colors.selectedBorder,
+                        styles.taskItem,
+                        {
+                          borderColor: selected
+                            ? colors.selectedBorder
+                            : colors.borderColor,
+                          backgroundColor: selected
+                            ? colors.selectedBackground
+                            : colors.backgroundColor,
                         },
                       ]}
-                    />
-                    <Text style={styles.taskText}>{task.title}</Text>
-                  </Pressable>
-                );
-              })
-            )}
-          </View>
+                      onPress={() => handleToggleTask(task.id)}
+                    >
+                      <View
+                        style={[
+                          styles.checkbox,
+                          selected && {
+                            backgroundColor: colors.checkboxColor,
+                            borderColor: colors.selectedBorder,
+                          },
+                        ]}
+                      />
+                      <Text style={styles.taskText}>{task.title}</Text>
+                    </Pressable>
+                  );
+                })
+              )}
+            </View>
 
-          <View style={styles.buttonRow}>
-            <Pressable style={styles.cancelButton} onPress={handleClose}>
-              <Text style={styles.cancelLabel}>取消</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.submitButton, isPending && styles.disabledButton]}
-              onPress={handleSubmit}
-              disabled={isPending}
-            >
-              <Text style={styles.submitLabel}>送出</Text>
-            </Pressable>
-          </View>
+            <View style={styles.buttonRow}>
+              <Pressable style={styles.cancelButton} onPress={handleClose}>
+                <Text style={styles.cancelLabel}>取消</Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.submitButton,
+                  (isPending || isUploading) && styles.disabledButton,
+                ]}
+                onPress={handleSubmit}
+                disabled={isPending || isUploading}
+              >
+                <Text style={styles.submitLabel}>
+                  {isUploading ? "上傳中..." : "送出"}
+                </Text>
+              </Pressable>
+            </View>
+          </ScrollView>
         </Pressable>
       </Pressable>
     </Modal>
@@ -195,6 +267,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f7fafc",
     borderRadius: 16,
     padding: 24,
+    maxHeight: "90%",
     shadowColor: "#000",
     shadowOpacity: 0.12,
     shadowOffset: { width: 0, height: 4 },
@@ -220,6 +293,37 @@ const styles = StyleSheet.create({
   textarea: {
     minHeight: 100,
     textAlignVertical: "top",
+  },
+  imageSection: {
+    marginBottom: 18,
+  },
+  imagePreview: {
+    width: "100%",
+    height: 200,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  uploadImageButton: {
+    backgroundColor: "#4f46e5",
+    borderRadius: 12,
+    padding: 14,
+    alignItems: "center",
+  },
+  uploadImageText: {
+    color: "#ffffff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  removeImageButton: {
+    backgroundColor: "#f3f4f6",
+    borderRadius: 12,
+    padding: 10,
+    alignItems: "center",
+  },
+  removeImageText: {
+    color: "#374151",
+    fontWeight: "600",
+    fontSize: 14,
   },
   taskSection: {
     marginBottom: 18,

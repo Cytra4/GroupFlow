@@ -106,13 +106,27 @@ export default function DiscussionCard({
 
   return (
     <View style={[styles.card, { borderColor }]}>
+    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+      <Image
+        source={{ uri: discussion.profiles?.avatarUrl || "https://picsum.photos/200" }}
+        style={styles.profileImage}
+      />
+      {discussion.profiles?.username ?? "匿名"}
+    </View>
+		{discussion.avatarUrl ? (
+			<TouchableOpacity
+				onPress={() => openImageModal(discussion.avatarUrl!)}
+			>
+				<Image
+					source={{ uri: discussion.avatarUrl }}
+					style={styles.commentImage}
+				/>
+			</TouchableOpacity>
+		) : null}
       <Text style={styles.title}>{discussion.title}</Text>
       <Text style={styles.content}>{discussion.content}</Text>
 
-      <View style={styles.metaRow}>
-        <Text style={styles.metaText}>
-          討論發起人：{discussion.profiles?.username ?? "匿名"}
-        </Text>
+      <View style={styles.metaRow}>  
         <Text style={styles.time}>
           {new Date(discussion.created_at).toLocaleString()}
         </Text>
@@ -125,9 +139,13 @@ export default function DiscussionCard({
         <View style={styles.replySection}>
           {comments.map((comment) => (
             <View key={comment.id} style={styles.commentRow}>
-              <Text style={styles.commentAuthor}>
-                {comment.profiles?.username ?? "匿名"}
-              </Text>
+				<View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+					<Image
+						source={{ uri: comment.profiles?.avatarUrl || "https://picsum.photos/200" }}
+						style={styles.profileImage}
+					/>
+					{comment.profiles?.username ?? "匿名"}
+				</View>
               <Text style={styles.commentContent}>{comment.content}</Text>
               {comment.avatarUrl ? (
                 <TouchableOpacity
@@ -201,7 +219,7 @@ export default function DiscussionCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#3a38382c",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -332,5 +350,11 @@ const styles = StyleSheet.create({
   ButtonText: {
     color: "#fff",
     fontWeight: "700",
+  },
+  profileImage: {
+	width: 24,
+	height: 24,
+	borderRadius: 12,
+	marginRight: 8,
   },
 });

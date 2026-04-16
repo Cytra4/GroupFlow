@@ -12,8 +12,10 @@ export function useDiscussions(groupId: string | undefined) {
       content,
       status,
       created_at,
+	  avatarUrl,
       profiles (
-        username
+        username,
+        avatarUrl
       )
     `,
 		filter: groupId ? { group_id: groupId } : undefined,
@@ -30,7 +32,8 @@ export function useAddDiscussion() {
 	const addDiscussion = async (
 		groupId: string,
 		title: string,
-		content: string
+		content: string,
+		avatarUrl?: string
 	) => {
 
 		if (!user) return;
@@ -43,6 +46,7 @@ export function useAddDiscussion() {
 				content,
 				status: true,
 				user_id: user.id,
+				avatarUrl,
 			},
 		});
 
