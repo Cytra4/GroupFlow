@@ -1,6 +1,6 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 // 假設你有這些 hooks
 import { useUpdatePasswordMutation, useVerifyPasswordMutation } from "@/lib/hooks/auth/user";
 
@@ -8,6 +8,8 @@ export default function AccountSettings() {
     const [step, setStep] = React.useState<"verify" | "update">("verify");
     const [passwords, setPasswords] = React.useState({ old: "", new: "", confirm: "" });
     const [error, setError] = React.useState("");
+
+    const router = useRouter();
 
     const verifyMutation = useVerifyPasswordMutation();
     const updateMutation = useUpdatePasswordMutation();
@@ -39,8 +41,9 @@ export default function AccountSettings() {
 
         updateMutation.mutate(passwords.new, {
             onSuccess: () => {
-                // Alert.alert("成功", "密碼已更新");
+                Alert.alert("成功", "密碼已更新");
                 // 成功後可以考慮跳回上一頁或重設狀態
+                router.back();
             },
             onError: (err) => setError(err.message),
         });

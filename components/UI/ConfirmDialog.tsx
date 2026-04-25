@@ -25,9 +25,15 @@ export const ConfirmDialog = forwardRef<ConfirmDialogRef, DialogProps>(
 
         return (
             <Modal transparent visible={visible} animationType="fade" onRequestClose={close}>
-                <View style={styles.overlay}>
-                    <View style={styles.dialog}>
+                {/* 1. 將最外層 View 改為 Pressable 並綁定 close */}
+                <Pressable style={styles.overlay} onPress={close}>
+
+                    {/* 2. 內層對話框需要另一個 Pressable 並攔截點擊事件 (stopPropagation) */}
+                    {/* 這樣點擊對話框內部時，就不會觸發外層的 close */}
+                    <Pressable style={styles.dialog} onPress={(e) => e.stopPropagation()}>
+
                         <View style={styles.content}>{children}</View>
+
                         <View style={styles.actions}>
                             <Pressable
                                 style={[styles.buttonFormat, { backgroundColor: "coral" }]}
@@ -45,10 +51,11 @@ export const ConfirmDialog = forwardRef<ConfirmDialogRef, DialogProps>(
                                 <Text style={styles.buttonText}>取消</Text>
                             </Pressable>
                         </View>
-                    </View>
-                </View>
+                    </Pressable>
+                </Pressable>
             </Modal>
         );
+
     }
 );
 

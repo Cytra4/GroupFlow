@@ -9,7 +9,7 @@ export type GroupMember = {
 		user_id: string;
 		username: string;
 		avatarUrl: string;
-	}[];
+	};
 };
 
 export function useGroupMembers(groupId: string) {
@@ -24,7 +24,7 @@ export function useGroupMembers(groupId: string) {
 				group_id, 
 				user_id, 
 				joined_at, 
-				profiles( 
+				profiles:user_id ( 
 					user_id, 
 					username,
 					avatarUrl
@@ -32,8 +32,10 @@ export function useGroupMembers(groupId: string) {
 				`)
 				.eq("group_id", groupId)
 				.order("joined_at", { ascending: true });
+
+			console.log("Fetched group members:", data, "Error:", error);
 			if (error) throw error;
-			return data ?? [];
+			return (data as any) ?? [];
 		},
 	}
 	);
