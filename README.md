@@ -13,21 +13,21 @@
 1. 安裝[Node.js](https://nodejs.org/zh-tw)
 
 2. 安裝Expo
-	```bash
-	npm install -g expo-cli
-	```
+```bash
+npm install -g expo-cli
+```
 
 3. 安裝依賴套件
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 4. 啟動APP
 
-   ```bash
-   npx expo start
-   ```
+```bash
+npx expo start
+```
 
 ## 啟動後該如何執行
 

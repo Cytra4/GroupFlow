@@ -37,9 +37,7 @@ function RootLayout() {
     useEffect(() => {
         if (!mounted) return;
 
-        if (user) {
-            router.replace('/');        // 進入 index（tabs 外或內都可）
-        } else {
+        if (!user) {
             router.replace('/login');
         }
     }, [user, mounted]);
