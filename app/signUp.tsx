@@ -55,30 +55,30 @@ export default function SignUp() {
 			>
 				<View style={styles.container}>
 					<Image
-						source={require("../assets/images/thinking_emoji.png")}
+						source={require("../assets/images/logo2.png")}
 						resizeMode="contain"
 						style={styles.logo}
 					/>
 
-					<View style={{ marginBottom: hp(5) }}>
-						<Text style={styles.title}>*那一天，人類回想起了被帳號支配的恐懼*</Text>
+					<View style={{ marginBottom: hp(4) }}>
+						<Text style={styles.title}>— 協作 ◆ 任務 ◆ 進度 ◆ 同步 —</Text>
 					</View>
 
 					<View style={{ marginBottom: hp(3) }}>
-						<Text style={styles.welcome}>馬上加入調查兵團</Text>
+						<Text style={styles.welcome}>馬上加入</Text>
 					</View>
 
 					<CustomInput
 						placeholder="使用者名稱"
 						onChange={(t) => signUpForm.onChange('username', t)}
-						boxStyle={[{ marginBottom: 25 }, (errorCode === 1) && {borderColor: "#E43636"}]}
+						boxStyle={[{ marginBottom: 25 }, (errorCode === 1) && { borderColor: "#E43636" }]}
 						iconName='user'
 					/>
 
 					<CustomInput
 						placeholder="信箱"
 						onChange={(t) => signUpForm.onChange('email', t)}
-						boxStyle={[{ marginBottom: 25 }, (errorCode === 2) && {borderColor: "#E43636"}]}
+						boxStyle={[{ marginBottom: 25 }, (errorCode === 2) && { borderColor: "#E43636" }]}
 						iconName='mail'
 						keyboardType='email-address'
 					/>
@@ -86,7 +86,7 @@ export default function SignUp() {
 					<CustomInput
 						placeholder="密碼"
 						onChange={(t) => signUpForm.onChange('password', t)}
-						boxStyle={[(errorCode >= 2) && {borderColor: "#E43636"}]}
+						boxStyle={[(errorCode >= 2) && { borderColor: "#E43636" }]}
 						iconName='lock'
 						secureText={true}
 					/>
@@ -124,13 +124,12 @@ const styles = StyleSheet.create({
 		paddingHorizontal: wp(4)
 	},
 	logo: {
-		height: hp(20),
-		width: wp(100),
-		alignSelf: "center"
+		height: hp(25),
+        alignSelf: "center"
 	},
 	title: {
-		fontSize: 30,
-		fontWeight: "bold"
+		fontSize: 18,
+		marginTop: 5
 	},
 	welcome: {
 		fontSize: 25

@@ -49,13 +49,13 @@ export default function Login() {
             >
                 <View style={styles.container}>
                     <Image
-                        source={require("../assets/images/thinking_emoji.png")}
+                        source={require("../assets/images/logo2.png")}
                         resizeMode="contain"
                         style={styles.logo}
                     />
 
-                    <View style={{ marginBottom: hp(5) }}>
-                        <Text style={styles.title}>*超酷的App標題*</Text>
+                    <View style={{ marginBottom: hp(4) }}>
+                        <Text style={styles.title}>— 協作 ◆ 任務 ◆ 進度 ◆ 同步 —</Text>
                     </View>
 
                     <View style={{ marginBottom: hp(3) }}>
@@ -114,13 +114,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: wp(4)
     },
     logo: {
-        height: hp(20),
-        width: wp(100),
+        height: hp(25),
         alignSelf: "center"
     },
     title: {
-        fontSize: 30,
-        fontWeight: "bold"
+        fontSize: 18,
+		marginTop: 5
     },
     welcome: {
         fontSize: 25
