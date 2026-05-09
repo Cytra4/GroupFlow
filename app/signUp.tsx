@@ -16,7 +16,7 @@ export default function SignUp() {
 	const signUpForm = useForm({ username: '', email: '', password: '' });
 	const signUpMutation = useSignUp();
 
-	function SignUp() {
+	function HandleSignUp() {
 		const { username, email, password } = signUpForm.values;
 
 		if (!username) {
@@ -39,6 +39,14 @@ export default function SignUp() {
 			email: email.trim(),
 			password: password.trim(),
 			username: username.trim(),
+		}, {
+			onSuccess: () => {
+                setError(null);
+                router.replace("/");
+            },
+            onError: () => {
+                setError("註冊失敗，請確認信箱與密碼是否正確");
+            }
 		});
 
 		if (signUpMutation.isSuccess) {
@@ -97,7 +105,7 @@ export default function SignUp() {
 						title="申請"
 						buttonStyle={styles.button}
 						loading={signUpMutation.isPending}
-						onPress={SignUp}
+						onPress={HandleSignUp}
 					/>
 
 					<View style={{ flexDirection: "row" }}>
