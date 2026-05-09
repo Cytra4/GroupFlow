@@ -111,7 +111,7 @@ export default function DiscussionCard({
         source={{ uri: discussion.profiles?.avatarUrl || "https://picsum.photos/200" }}
         style={styles.profileImage}
       />
-      {discussion.profiles?.username ?? "匿名"}
+      <Text>{discussion.profiles?.username ?? "匿名"}</Text>
     </View>
 		{discussion.avatarUrl ? (
 			<TouchableOpacity
@@ -144,7 +144,7 @@ export default function DiscussionCard({
 						source={{ uri: comment.profiles?.avatarUrl || "https://picsum.photos/200" }}
 						style={styles.profileImage}
 					/>
-					{comment.profiles?.username ?? "匿名"}
+					<Text>{comment.profiles?.username ?? "匿名"}</Text>
 				</View>
               <Text style={styles.commentContent}>{comment.content}</Text>
               {comment.avatarUrl ? (
@@ -219,7 +219,7 @@ export default function DiscussionCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#3a38382c",
+    backgroundColor: "#fffffff1",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
