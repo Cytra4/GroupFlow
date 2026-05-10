@@ -42,9 +42,10 @@ export type Group_Member = {
 
 export type Task = {
   id: number;
+  group_id: string;
   title: string;
   description: string;
-  status: string;
+  status: "finished" | "unfinished";
   priority: number;
   start_date: string;
   due_date: string;

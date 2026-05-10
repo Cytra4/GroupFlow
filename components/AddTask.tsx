@@ -10,6 +10,11 @@ import DatePicker from "./datePicker/DatePicker";
 import { Loading } from "./Loading";
 import { PressableOpacity } from "./PressableOpacity";
 
+// finished > due = 完成
+// unfinished > due = 逾期
+// unfinished > start = 進行中
+// unfinished < start = 尚未開始
+
 function GetPriorityLabel(prior: number) {
 	switch (prior) {
 		case 1:
