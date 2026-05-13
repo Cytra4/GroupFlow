@@ -38,7 +38,7 @@ export default function Login() {
     }
 
     if (user) {
-        return <Redirect href="/tasks/task_overview" />;
+        return <Redirect href="/" />;
     }
 
     return (

@@ -1,10 +1,12 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.organizeImports": "explicit",
-    "source.sortMembers": "explicit"
-  },
-  "editor.tabSize": 4,
-  "editor.detectIndentation": false,
-  "editor.insertSpaces": false
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit",
+		"source.organizeImports": "explicit",
+		"source.sortMembers": "explicit"
+	},
+	"editor.tabSize": 4,
+	"editor.detectIndentation": false,
+	"editor.insertSpaces": false,
+	//   "editor.fontFamily": "'JetBrains Mono', Consolas, 'Courier New', monospace",
+	"editor.fontLigatures": true,
 }

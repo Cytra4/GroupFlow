@@ -48,7 +48,7 @@ function RootLayout() {
 				name="index"
 				options={{
 					headerShown: true,
-					headerTitle: "我的小組",
+					headerTitle: "Group Flow",
 					headerTitleAlign: "center",
 					// headerRight: () => <IndexHeader />
 				}}
@@ -75,7 +75,12 @@ function RootLayout() {
 			/>
 
 			<Stack.Screen
-				name="tasks/task_overview"
+				name="tasks/overview"
+				options={{
+					headerShown: true,
+					headerTitle: "任務總覽",
+					headerTitleAlign: "center",
+				}}
 			/>
 		</Stack>
 	);

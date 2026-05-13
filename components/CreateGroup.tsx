@@ -1,22 +1,33 @@
 import { useProfileQuery } from "@/lib/hooks/auth/profile";
 import { useInsert } from "@/lib/supabase/query";
-import { hp } from "@/scripts/constants";
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { Button } from "./Button";
+import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
+import { DialogRef } from "./UI/BaseDialog";
+import { ConfirmDialog } from "./UI/ConfirmDialog";
 
-export default function CreateGroup() {
-	const [visible, setVisible] = useState<boolean>(false);
+export const CreateGroup = forwardRef<DialogRef>((_, ref) => {
+	const dialogRef = useRef<DialogRef>(null);
 	const [groupName, setGroupName] = useState<string>("");
 	const [error, setError] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
+
 	const profileQuery = useProfileQuery();
 	const queryClient = useQueryClient();
 	const groupInsertMutation = useInsert();
 
-	async function HandleJoin() {
-		if (!groupName) {
+	// 將控制方法轉發給外部的控制按鈕
+	useImperativeHandle(ref, () => ({
+		open: () => {
+			setGroupName("");
+			setError("");
+			dialogRef.current?.open();
+		},
+		close: () => dialogRef.current?.close(),
+	}));
+
+	async function handleCreate() {
+		if (!groupName.trim()) {
 			setError("小組名稱不得為空");
 			return;
 		}
@@ -26,19 +37,19 @@ export default function CreateGroup() {
 
 		try {
 			await groupInsertMutation.mutateAsync({
-				table: 'groups', row: {
-					name: `${groupName}`,
+				table: 'groups',
+				row: {
+					name: groupName.trim(),
 					created_by: profileQuery.data?.user_id
 				}
 			});
 
 			queryClient.invalidateQueries({ queryKey: ['groups'] });
-			setGroupName("");
-			setVisible(false);
+			dialogRef.current?.close();
 		}
 		catch (err: any) {
-			setError("建立小組發生錯誤，請重新嘗試")
-			console.log(err)
+			setError("建立小組發生錯誤，請重新嘗試");
+			console.log(err);
 		}
 		finally {
 			setLoading(false);
@@ -46,107 +57,36 @@ export default function CreateGroup() {
 	}
 
 	return (
-		<>
-			<Button
-				title="建立小組"
-				onPress={() => setVisible(true)}
-				buttonStyle={styles.button}
-			/>
+		<ConfirmDialog
+			ref={dialogRef}
+			confirmText={loading ? "建立中..." : "建立"}
+			onConfirm={handleCreate}
+		>
+			<View style={styles.dialogContent}>
+				<Text style={styles.title}>建立你的小組</Text>
+				<TextInput
+					style={[styles.input, error ? { borderColor: "#E43636" } : {}]}
+					placeholder="請輸入小組名稱"
+					placeholderTextColor={"#939393"}
+					value={groupName}
+					onChangeText={setGroupName}
+				/>
 
-			<Modal
-				transparent
-				animationType="fade"
-				visible={visible}
-				onRequestClose={() => setVisible(false)}
-				statusBarTranslucent
-			>
-				<View style={styles.centeredView}>
-					<Pressable
-						style={StyleSheet.absoluteFill}
-						onPress={() => setVisible(false)}
-					/>
-					<View style={styles.modalView}>
-						<Text style={styles.title}>建立你的小組</Text>
-						<TextInput
-							style={[styles.input, error && { borderColor: "#E43636" }]}
-							placeholder="請輸入小組名稱"
-							placeholderTextColor={"#939393"}
-							value={groupName}
-							onChangeText={setGroupName}
-						/>
-
-						{error ?
-							<Text style={styles.error}>{error}</Text> : null
-						}
-
-						<View style={{ flexDirection: 'row' }}>
-							<Button
-								title="建立"
-								buttonStyle={[styles.modalButton, styles.createButton]}
-								textStyle={styles.buttonText}
-								onPress={HandleJoin}
-								loading={loading}
-							/>
-
-							<Button
-								title="取消"
-								buttonStyle={[styles.modalButton, styles.cancelButton]}
-								textStyle={styles.buttonText}
-								onPress={() => {
-									setGroupName("");
-									setError("");
-									setVisible(false);
-								}}
-							/>
-						</View>
-					</View>
-				</View>
-			</Modal>
-		</>
-	)
-}
+				{error ? <Text style={styles.error}>{error}</Text> : null}
+			</View>
+		</ConfirmDialog>
+	);
+});
 
 const styles = StyleSheet.create({
-	centeredView: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor: 'rgba(0,0,0,0.3)'
-	},
-	modalView: {
-		width: "80%",
-		backgroundColor: "white",
-		borderRadius: 16,
-		padding: 20,
+	dialogContent: {
 		alignItems: "center",
-		shadowColor: "#000",
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
-		elevation: 5,
-	},
-	button: {
-		borderRadius: 6,
-		paddingHorizontal: 25,
-		margin: 20
-	},
-	modalButton: {
-		borderRadius: 5,
-		marginHorizontal: 12,
-		paddingHorizontal: 30,
-		height: hp(5)
-	},
-	buttonText: {
-		fontSize: 18
-	},
-	cancelButton: {
-		backgroundColor: "#888787ff"
-	},
-	createButton: {
-		backgroundColor: "coral"
+		width: "100%",
 	},
 	title: {
 		fontSize: 18,
-		fontWeight: 'bold'
+		fontWeight: 'bold',
+		color: "#333",
 	},
 	input: {
 		width: "100%",
@@ -154,7 +94,7 @@ const styles = StyleSheet.create({
 		borderColor: "#ccc",
 		borderRadius: 8,
 		padding: 10,
-		marginVertical: 15,
+		marginTop: 15,
 	},
 	error: {
 		color: "#E43636",
@@ -162,4 +102,4 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		marginBottom: 16
 	}
-})
+});

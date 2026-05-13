@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useRef } from 'react';
-import { Animated, GestureResponderEvent, Pressable, StyleProp, ViewStyle } from 'react-native';
+import { Animated, GestureResponderEvent, Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 
 interface PressableEffectProps {
 	children: ReactNode;
@@ -24,19 +24,10 @@ const PressableEffect: React.FC<PressableEffectProps> = ({
 
 	const handlePressIn = useCallback(() => {
 		Animated.sequence([
-			Animated.timing(anim, {
-				toValue: 1,
-				duration: durationIn,
-				useNativeDriver: false,
-			}),
-			Animated.timing(anim, {
-				toValue: 0,
-				duration: durationOut,
-				useNativeDriver: false,
-			}),
+			Animated.timing(anim, { toValue: 1, duration: durationIn, useNativeDriver: false }),
+			Animated.timing(anim, { toValue: 0, duration: durationOut, useNativeDriver: false }),
 		]).start();
 	}, [anim, durationIn, durationOut]);
-
 
 	const backgroundColor = anim.interpolate({
 		inputRange: [0, 1],
@@ -45,12 +36,12 @@ const PressableEffect: React.FC<PressableEffectProps> = ({
 
 	return (
 		<Pressable
-			onPressIn={handlePressIn} // 按下瞬間觸發
-			onPressOut={onPress}         // 執行外部邏輯
+			onPressIn={handlePressIn}
+			onPress={onPress} // 💡 修正點：直接改回標準的 onPress，不要用 onPressOut
+			style={[style, { overflow: 'hidden' }]}
 		>
-			<Animated.View style={[style, { backgroundColor }]}>
-				{children}
-			</Animated.View>
+			<Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor }]} />
+			{children}
 		</Pressable>
 	);
 };

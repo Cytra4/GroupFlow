@@ -12,8 +12,8 @@ export default function SettingsLayout() {
                 options={{ title: "個人資料" }}
             />
             <Stack.Screen
-                name="account"
-                options={{ title: "帳號設定" }}
+                name="password"
+                options={{ title: "密碼修改" }}
             />
             {/* <Stack.Screen
         name="notifications"

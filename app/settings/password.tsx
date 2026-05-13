@@ -4,7 +4,7 @@ import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-nativ
 // 假設你有這些 hooks
 import { useUpdatePasswordMutation, useVerifyPasswordMutation } from "@/lib/hooks/auth/user";
 
-export default function AccountSettings() {
+export default function PasswordSettings() {
 	const [step, setStep] = React.useState<"verify" | "update">("verify");
 	const [passwords, setPasswords] = React.useState({ old: "", new: "", confirm: "" });
 	const [error, setError] = React.useState("");

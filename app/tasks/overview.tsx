@@ -126,8 +126,12 @@ export const TaskDialogProvider = ({ children }: { children: React.ReactNode }) 
 
 	const open = (data: Partial<Task>) => {
 		setActiveTask(data);
-		dialogRef.current?.open();
 	};
+
+	React.useEffect(() => {
+		if (activeTask)
+			dialogRef.current?.open();
+	}, [activeTask]);
 
 	return (
 		<TaskDialogContext.Provider value={{ open }}>
@@ -151,7 +155,7 @@ export const TaskDialogProvider = ({ children }: { children: React.ReactNode }) 
 const TaskOverview = () => {
 	const groupedData = React.useMemo(() => groupTasksByDate(MOCK_RAW_TASKS), [MOCK_RAW_TASKS]);
 
-	return (
+	return (<>
 		<TaskDialogProvider>
 			<Text style={{ fontSize: 20, fontWeight: 'bold', margin: 16 }}>任務總覽</Text>
 			<FlatList
@@ -168,7 +172,7 @@ const TaskOverview = () => {
 				contentContainerStyle={styles.list}
 			/>
 		</TaskDialogProvider>
-	);
+	</>);
 };
 
 export default TaskOverview
@@ -346,7 +350,7 @@ export const MOCK_RAW_TASKS: Task[] = [
 		created_by: "DBA",
 		updated_at: "2024-03-11",
 	},
-		{
+	{
 		id: 14,
 		group_id: "G-09",
 		title: "我不知道",
