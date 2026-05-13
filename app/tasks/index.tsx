@@ -35,21 +35,21 @@ function getStatus(task: Task): "完成" | "逾期" | "進行中" | "尚未開�
 }
 
 const TaskCard = ({ task }: { task: Task }) => {
-	const dialog = React.useContext(TaskDialogContext);
+	const open = React.useContext(TaskDialogContext);
 	const config = PRIORITY_MAP[task.priority] || DEFAULT_PRIORITY;
 
 	return (
-		<PressableEffect style={cardStyles.container} onPress={() => dialog?.open(task)}>
+		<PressableEffect style={cardStyles.container} onPress={() => open(task)}>
 			{/* <View style={cardStyles.container}> */}
-				<View style={cardStyles.left}>
-					<Text style={cardStyles.topText}>13:00</Text>
-					<Text style={cardStyles.bottomText}>{getStatus(task)}</Text>
-				</View>
-				<View style={[cardStyles.bar, { backgroundColor: config.color }]}></View>
-				<View style={cardStyles.right}>
-					<Text style={cardStyles.topText}>{task.title}</Text>
-					<Text style={cardStyles.bottomText}>{task.description}</Text>
-				</View>
+			<View style={cardStyles.left}>
+				<Text style={cardStyles.topText}>13:00</Text>
+				<Text style={cardStyles.bottomText}>{getStatus(task)}</Text>
+			</View>
+			<View style={[cardStyles.bar, { backgroundColor: config.color }]}></View>
+			<View style={cardStyles.right}>
+				<Text style={cardStyles.topText}>{task.title}</Text>
+				<Text style={cardStyles.bottomText}>{task.description}</Text>
+			</View>
 			{/* </View> */}
 		</PressableEffect>
 	)
@@ -121,26 +121,24 @@ const listStyles = StyleSheet.create({
 	}
 })
 
-const TaskDialogContext = React.createContext<{ open: (task: Partial<Task>) => void } | null>(null)
-
+const TaskDialogContext = React.createContext<(task: Partial<Task> | null) => void>(() => { });
 // // TaskDialogContext.tsx
 const TaskDialogProvider = ({ children }: { children: React.ReactNode }) => {
 	const dialogRef = React.useRef<DialogRef>(null);
 	const [activeTask, setActiveTask] = React.useState<Partial<Task> | null>(null);
 
-	const open = (data: Partial<Task>) => {
-		setActiveTask(data);
-		dialogRef.current?.open();
+	const open = (task: Partial<Task> | null) => {
+		setActiveTask(task);
+		if (task) dialogRef.current?.open();
 	};
 
 	return (
-		<TaskDialogContext.Provider value={{ open }}>
+		<TaskDialogContext value={open}>
 			{children}
-			<BaseDialog ref={dialogRef}>
-				{activeTask && (
+			{activeTask && (
+				<BaseDialog ref={dialogRef}>
 					<View>
 						<Text>{activeTask.title}</Text>
-
 
 						<Text>{activeTask.description || "暫無描述"}</Text>
 						<Text>{activeTask.description || "暫無描述"}</Text>
@@ -149,9 +147,9 @@ const TaskDialogProvider = ({ children }: { children: React.ReactNode }) => {
 						<Text>狀態: {activeTask.status}</Text>
 						<Text>Group: {activeTask.group_id}</Text>
 					</View>
-				)}
-			</BaseDialog>
-		</TaskDialogContext.Provider>
+				</BaseDialog>
+			)}
+		</TaskDialogContext>
 	);
 };
 
