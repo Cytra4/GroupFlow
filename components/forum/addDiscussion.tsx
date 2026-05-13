@@ -68,7 +68,7 @@ export default function AddDiscussion({
 }: AddDiscussionProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
   const [imageUri, setImageUri] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const { addDiscussion, isPending } = useAddDiscussion();
@@ -84,7 +84,7 @@ export default function AddDiscussion({
     onClose();
   };
 
-  const handleToggleTask = (taskId: string) => {
+  const handleToggleTask = (taskId: number) => {
     setSelectedTaskIds((prev) =>
       prev.includes(taskId)
         ? prev.filter((id) => id !== taskId)

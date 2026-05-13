@@ -42,6 +42,7 @@ export default function Forum() {
                   openDiscussionId === item.id ? null : item.id,
                 )
               }
+              onDeleted={refetch}
             />
           )}
         />
