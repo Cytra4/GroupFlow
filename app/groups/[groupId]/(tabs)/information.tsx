@@ -1,5 +1,6 @@
 import LogDisplay from '@/components/LogDisplay';
-import { ConfirmDialog, ConfirmDialogRef } from '@/components/UI/ConfirmDialog';
+import { DialogRef } from '@/components/UI/BaseDialog';
+import { ConfirmDialog } from '@/components/UI/ConfirmDialog';
 import { useProfileQuery } from '@/lib/hooks/auth/profile';
 import { useDeleteGroupMutation, useLeaveGroupMutation } from '@/lib/hooks/idk/group';
 import { useGroup } from '@/lib/hooks/idk/useGroups';
@@ -24,8 +25,8 @@ export default function Information() {
 
     const leaveGroup = useLeaveGroupMutation();
     const deleteGroup = useDeleteGroupMutation();
-    const leaveDialogRef = React.useRef<ConfirmDialogRef>(null);
-    const deleteDialogRef = React.useRef<ConfirmDialogRef>(null);
+    const leaveDialogRef = React.useRef<DialogRef>(null);
+    const deleteDialogRef = React.useRef<DialogRef>(null);
 
     function handleLeaveGroup() {
         leaveGroup.mutate(groupId, {

@@ -47,7 +47,7 @@ export default function TaskCard({
 					flexDirection: "column",
 					borderRadius: isEditable || isFinished ? 0 : 16
 				},
-				(isEditable || isFinished) && {borderColor: "#eee"}
+				(isEditable || isFinished) && { borderColor: "#eee" }
 			]}
 		>
 			<View style={styles.row}>
@@ -79,18 +79,18 @@ export default function TaskCard({
 					<View style={styles.iconTabs}>
 						<TaskFinish
 							iconColor={priorityColor}
-							iconStyle={{marginBottom: -10}}
+							iconStyle={{ marginBottom: -10 }}
 							taskData={taskData}
 						/>
 						<TaskDetail
 							iconColor={priorityColor}
-							iconStyle={{marginBottom: -10}}
+							iconStyle={{ marginBottom: -10 }}
 							taskData={taskData}
 							time={dateRange}
 						/>
 						<TaskEdit
 							iconColor={priorityColor}
-							iconStyle={{marginBottom: -10}}
+							iconStyle={{ marginBottom: -10 }}
 							taskData={taskData}
 						/>
 					</View>
@@ -108,10 +108,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		marginBottom: 16,
 
-		shadowColor: "#000",
-		shadowOpacity: 0.1,
-		shadowRadius: 6,
-		shadowOffset: { width: 1, height: 4 },
+		boxShadow: '1px 4px 6px rgba(0, 0, 0, 0.1)',
 		elevation: 4,
 	},
 

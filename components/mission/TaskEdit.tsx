@@ -398,9 +398,7 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		padding: 20,
 		alignItems: "center",
-		shadowColor: "#000",
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
+		boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.25)',
 		elevation: 5,
 	},
 	iconButton: {

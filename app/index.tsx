@@ -34,7 +34,7 @@ export default function Index() {
 			{/* 頂部固定區域：不隨之滾動 */}
 			<View style={styles.topActionRow}>
 				<PressableEffect
-					onPress={() => router.push('/tasks/overview')}
+					onPress={() => router.push('/tasks')}
 					style={[styles.btn]}
 				>
 					<Text style={styles.text}>查看任務</Text>
@@ -79,7 +79,6 @@ function GroupListScreen({ userGroups }: { userGroups: Group[] | undefined }) {
 
 	return (
 		<View style={{ flex: 1 }}>
-			{/* 💡 核心改動：將標題與搜尋框移出 FlatList，使其固定不動 */}
 			<View style={groupStyles.headerRow}>
 				<Text style={groupStyles.headerTitle}>所有小組</Text>
 				<JoinGroup />
@@ -96,7 +95,6 @@ function GroupListScreen({ userGroups }: { userGroups: Group[] | undefined }) {
 				/>
 			</View>
 
-			{/* 💡 FlatList 現在只負責渲染與滾動卡片本身 */}
 			<FlatList
 				showsVerticalScrollIndicator={false}
 				data={filteredGroups}
@@ -146,10 +144,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 1, height: 2 },
-		shadowOpacity: 0.08,
-		shadowRadius: 5,
+		boxShadow: '1px 2px 5px rgba(0, 0, 0, 0.08)',
 		elevation: 2,
 	},
 	text: {
@@ -199,10 +194,7 @@ const groupStyles = StyleSheet.create({
 		fontSize: 16,
 		borderColor: '#eee',
 		borderWidth: 1,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.05,
-		shadowRadius: 3,
+		boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.05)',
 		elevation: 2,
 	},
 });

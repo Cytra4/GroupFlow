@@ -16,14 +16,20 @@ export default function Layout() {
 }
 
 function RootLayout() {
-	const { user, setAuth, setUserData } = useAuth();
+	const { user, setAuth } = useAuth();
 	const router = useRouter();
 	const [mounted, setMounted] = useState(false);
+	const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+	console.log("=== RootLayout 重新渲染 ===");
+	console.log("目前 user 狀態:", user ? "有值" : "null/undefined");
+	console.log("目前驗證狀態 isAuthChecking:", isAuthChecking);
 
 	useEffect(() => {
 		const { data: sub } = supabase.auth.onAuthStateChange(
 			(_event, session) => {
 				setAuth(session?.user ?? null);
+				setIsAuthChecking(false);
 			}
 		);
 
@@ -34,54 +40,31 @@ function RootLayout() {
 		setMounted(true);
 	}, []);
 
+	// 修正後的路由防護邏輯
 	useEffect(() => {
-		if (!mounted) return;
+		if (!mounted || isAuthChecking) return;
 
 		if (!user) {
+			// 1. 沒登入，強制踢到登入頁
 			router.replace('/login');
-		}
-	}, [user, mounted]);
+		} 
+		// 2. 💡 已登入的情況下，熱更新時「什麼都不要做」！
+		// 刪除原本的 else { router.dismissAll(); }，這樣就不會亂跳回首頁
+		
+	}, [user, mounted, isAuthChecking]); 
+
+	if (!mounted || isAuthChecking) {
+		return null; 
+	}
 
 	return (
 		<Stack>
-			<Stack.Screen
-				name="index"
-				options={{
-					headerShown: true,
-					headerTitle: "Group Flow",
-					headerTitleAlign: "center",
-					// headerRight: () => <IndexHeader />
-				}}
-			/>
-
-			<Stack.Screen
-				name="groups/[groupId]"
-				options={{ headerShown: false }}
-			/>
-
-			<Stack.Screen
-				name="login"
-				options={{ headerShown: false }}
-			/>
-
-			<Stack.Screen
-				name="signUp"
-				options={{ headerShown: false }}
-			/>
-
-			<Stack.Screen
-				name="settings"
-				options={{ headerShown: false, }}
-			/>
-
-			<Stack.Screen
-				name="tasks/overview"
-				options={{
-					headerShown: true,
-					headerTitle: "任務總覽",
-					headerTitleAlign: "center",
-				}}
-			/>
+			<Stack.Screen name="index" options={{ headerShown: true, headerTitle: "Group Flow", headerTitleAlign: "center" }} />
+			<Stack.Screen name="groups/[groupId]" options={{ headerShown: false }} />
+			<Stack.Screen name="login" options={{ headerShown: false }} />
+			<Stack.Screen name="signUp" options={{ headerShown: false }} />
+			<Stack.Screen name="settings" options={{ headerShown: false }} />
+			<Stack.Screen name="tasks/index" options={{ headerShown: true, headerTitle: "任務總覽", headerTitleAlign: "center" }} />
 		</Stack>
 	);
 }

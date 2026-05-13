@@ -1,12 +1,12 @@
-import { BaseDialog, DialogRef } from '@/components/UI/BaseDialog'
-import PressableEffect from '@/components/UI/PressableEffect'
-import { Task } from '@/types/supabase'
-import React from 'react'
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { BaseDialog, DialogRef } from '@/components/UI/BaseDialog';
+import PressableEffect from '@/components/UI/PressableEffect';
+import { Task } from '@/types/supabase';
+import React from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 
 // constants/priority.ts
-export const PRIORITY_MAP: Record<number, { label: string, color: string, bgColor: string }> = {
+const PRIORITY_MAP: Record<number, { label: string, color: string, bgColor: string }> = {
 	1: { label: '高度優先', color: '#E53935', bgColor: '#FFEBEE' },
 	2: { label: '中高度優先', color: '#FB8C00', bgColor: '#FFF3E0' },
 	3: { label: '中度優先', color: '#1E88E5', bgColor: '#E3F2FD' },
@@ -14,8 +14,8 @@ export const PRIORITY_MAP: Record<number, { label: string, color: string, bgColo
 	5: { label: '低度優先', color: '#757575', bgColor: '#F5F5F5' },
 };
 
-// 預設值，萬一後端給了 1~5 以外的數字
-export const DEFAULT_PRIORITY = { label: '未知', color: '#9E9E9E', bgColor: '#F5F5F5' };
+// // 預設值，萬一後端給了 1~5 以外的數字
+const DEFAULT_PRIORITY = { label: '未知', color: '#9E9E9E', bgColor: '#F5F5F5' };
 
 
 function getStatus(task: Task): "完成" | "逾期" | "進行中" | "尚未開始" {
@@ -39,8 +39,8 @@ const TaskCard = ({ task }: { task: Task }) => {
 	const config = PRIORITY_MAP[task.priority] || DEFAULT_PRIORITY;
 
 	return (
-		<PressableEffect onPress={() => dialog?.open(task)}>
-			<View style={cardStyles.container}>
+		<PressableEffect style={cardStyles.container} onPress={() => dialog?.open(task)}>
+			{/* <View style={cardStyles.container}> */}
 				<View style={cardStyles.left}>
 					<Text style={cardStyles.topText}>13:00</Text>
 					<Text style={cardStyles.bottomText}>{getStatus(task)}</Text>
@@ -50,7 +50,7 @@ const TaskCard = ({ task }: { task: Task }) => {
 					<Text style={cardStyles.topText}>{task.title}</Text>
 					<Text style={cardStyles.bottomText}>{task.description}</Text>
 				</View>
-			</View>
+			{/* </View> */}
 		</PressableEffect>
 	)
 }
@@ -59,7 +59,8 @@ const cardStyles = StyleSheet.create({
 	container: {
 		flexDirection: 'row',
 		paddingVertical: 8,
-		paddingHorizontal: 16,
+		paddingHorizontal: 10,
+		borderRadius: 8,
 	},
 	left: {
 		width: 60,
@@ -84,21 +85,25 @@ const cardStyles = StyleSheet.create({
 	}
 })
 
-const TaskList = ({ date, tasks }: { date: string; tasks: Task[] }) => (
-	<View style={listStyles.container}>
-		<View style={listStyles.header}>
-			<Text style={listStyles.headerText}>{date}</Text>
-			<View style={listStyles.bar}></View>
+// 將原本的 const TaskList = ... 改為：
+function TaskList({ date, tasks }: { date: string; tasks: Task[] }) {
+	return (
+		<View style={listStyles.container}>
+			<View style={listStyles.header}>
+				<Text style={listStyles.headerText}>{date}</Text>
+				<View style={listStyles.bar}></View>
+			</View>
+			{tasks.map((task) => (
+				<TaskCard key={`${date}-${task.id}`} task={task} />
+			))}
 		</View>
-		{/* 顯示當天的 Task */}
-		{tasks.map((task) => (
-			<TaskCard key={`${date}-${task.id}`} task={task} />
-		))}
-	</View>
-)
+	);
+}
+
 
 const listStyles = StyleSheet.create({
 	container: {
+
 	},
 	headerText: {
 		fontSize: 16,
@@ -108,7 +113,6 @@ const listStyles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 12,
-		paddingHorizontal: 16,
 	},
 	bar: {
 		flex: 1,
@@ -119,19 +123,15 @@ const listStyles = StyleSheet.create({
 
 const TaskDialogContext = React.createContext<{ open: (task: Partial<Task>) => void } | null>(null)
 
-// TaskDialogContext.tsx
-export const TaskDialogProvider = ({ children }: { children: React.ReactNode }) => {
+// // TaskDialogContext.tsx
+const TaskDialogProvider = ({ children }: { children: React.ReactNode }) => {
 	const dialogRef = React.useRef<DialogRef>(null);
 	const [activeTask, setActiveTask] = React.useState<Partial<Task> | null>(null);
 
 	const open = (data: Partial<Task>) => {
 		setActiveTask(data);
+		dialogRef.current?.open();
 	};
-
-	React.useEffect(() => {
-		if (activeTask)
-			dialogRef.current?.open();
-	}, [activeTask]);
 
 	return (
 		<TaskDialogContext.Provider value={{ open }}>
@@ -140,6 +140,9 @@ export const TaskDialogProvider = ({ children }: { children: React.ReactNode }) 
 				{activeTask && (
 					<View>
 						<Text>{activeTask.title}</Text>
+
+
+						<Text>{activeTask.description || "暫無描述"}</Text>
 						<Text>{activeTask.description || "暫無描述"}</Text>
 						{/* 這裡可以顯示更多欄位，例如優先級 */}
 						<Text>優先級: {activeTask.priority}</Text>
@@ -153,38 +156,37 @@ export const TaskDialogProvider = ({ children }: { children: React.ReactNode }) 
 };
 
 const TaskOverview = () => {
-	const groupedData = React.useMemo(() => groupTasksByDate(MOCK_RAW_TASKS), [MOCK_RAW_TASKS]);
+	const groupedData = React.useMemo(() => groupTasksByDate(MOCK_RAW_TASKS), []);
 
-	return (<>
+	return (
 		<TaskDialogProvider>
-			<Text style={{ fontSize: 20, fontWeight: 'bold', margin: 16 }}>任務總覽</Text>
 			<FlatList
-				// data={groupedData.filter(group => group.tasks.some(task => task.status === "unfinished"))} // 只顯示有任務的日期
 				data={groupedData}
-				keyExtractor={(item) => item.dateLabel} // 使用日期作為組別 ID
+				keyExtractor={(item) => item.dateLabel}
 				renderItem={({ item }) => (
 					<TaskList
 						date={item.dateLabel}
-						// tasks={item.tasks.filter(task => task.status === "unfinished")} // 只顯示未完成的任務
 						tasks={item.tasks}
 					/>
 				)}
 				contentContainerStyle={styles.list}
 			/>
 		</TaskDialogProvider>
-	</>);
+	);
 };
 
-export default TaskOverview
+export default TaskOverview;
 
 const styles = StyleSheet.create({
 	list: {
 		gap: 16,
+		backgroundColor: "#fff",
+		paddingHorizontal: 20,
 	}
 })
 
 // 轉換函式的類型定義
-export interface GroupedTask {
+interface GroupedTask {
 	dateLabel: string;
 	tasks: Task[];
 }
@@ -212,7 +214,7 @@ export interface GroupedTask {
 // };
 
 // TODO: 時間邏輯要加強，start < now 隱藏
-export const groupTasksByDate = (tasks: Task[]): GroupedTask[] => {
+const groupTasksByDate = (tasks: Task[]): GroupedTask[] => {
 	const groups = tasks
 		// .filter(task => task.status === "unfinished")
 		.reduce((acc, task) => {
@@ -256,7 +258,7 @@ const recurringTaskBase: Task = {
 	updated_at: "2024-03-08",
 };
 
-export const MOCK_RAW_TASKS: Task[] = [
+const MOCK_RAW_TASKS: Task[] = [
 	// --- 3月9號 ---
 	{ ...recurringTaskBase, start_date: "2024-03-09", due_date: "2024-03-09" },
 	{

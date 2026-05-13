@@ -53,10 +53,7 @@ const styles = StyleSheet.create({
 		// marginVertical: 12,
 		width: "100%",
 
-		shadowColor: '#000',
-		shadowOpacity: 0.1,
-		shadowRadius: 6,
-		shadowOffset: { width: 0, height: 3 },
+		boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.1)',
 		elevation: 5,
 		overflow: "hidden",
 	},

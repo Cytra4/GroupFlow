@@ -1,11 +1,14 @@
+import { DialogRef } from "@/components/UI/BaseDialog";
+import { ConfirmDialog } from "@/components/UI/ConfirmDialog";
 import { useLogoutMutation } from "@/lib/hooks/auth/user";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function SettingsIndex() {
 	const router = useRouter();
+	const logoutDialogRef = React.useRef<DialogRef>(null)
 
 	const sections = [
 		{ id: "profile", title: "個人資料", route: "profile", name: "user" },
@@ -29,9 +32,20 @@ export default function SettingsIndex() {
 				</SettingsSection>
 			))}
 
-			<SettingsSection withIcon={false} onPress={useLogoutMutation().mutate}>
+			<SettingsSection withIcon={false} onPress={() => logoutDialogRef.current?.open()}>
 				<Text style={{ color: "coral", fontWeight: 'bold' }}>登出</Text>
 			</SettingsSection>
+
+			{/* 💡 4. 將彈窗放置在畫面最外層 */}
+			<ConfirmDialog
+				ref={logoutDialogRef}
+				confirmText="確認"
+				onConfirm={useLogoutMutation().mutate}
+			>
+				<Text style={{ fontSize: 16, textAlign: "center", color: "#222" }}>
+					是否登出？
+				</Text>
+			</ConfirmDialog>
 		</View>
 	);
 }
