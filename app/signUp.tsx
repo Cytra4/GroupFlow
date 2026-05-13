@@ -41,18 +41,14 @@ export default function SignUp() {
 			username: username.trim(),
 		}, {
 			onSuccess: () => {
-                setError(null);
-                router.replace("/");
+				console.log("User create success.")
+				setError(null);
+				router.replace("/");
             },
             onError: () => {
                 setError("註冊失敗，請確認信箱與密碼是否正確");
             }
 		});
-
-		if (signUpMutation.isSuccess) {
-			console.log("User create success.")
-			setError(null);
-		}
 	}
 
 	return (

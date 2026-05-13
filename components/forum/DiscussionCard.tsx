@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 4,
     color: "#111827",
-    lineHeight: 24,
+    lineHeight: 30,
   },
   content: {
     fontSize: 20,
