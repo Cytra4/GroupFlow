@@ -3,10 +3,11 @@ import { useAddNewTask } from "@/lib/supabase/models/task";
 import { wp } from "@/scripts/constants";
 import { useGlobalSearchParams } from "expo-router";
 import { useState } from "react";
-import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import { Button } from "./Button";
 import DatePicker from "./datePicker/DatePicker";
+import TimePicker from "./datePicker/TimePicker";
 import { Loading } from "./Loading";
 import { PressableOpacity } from "./PressableOpacity";
 
@@ -34,8 +35,12 @@ export default function AddTask() {
 	const [visible, setVisible] = useState(false);
 	const [taskTitle, setTaskTitle] = useState<string>("");
 	const [taskContent, setTaskContent] = useState<string>("");
+
 	const [startDate, setStartDate] = useState<Date>(new Date());
 	const [endDate, setEndDate] = useState<Date>(new Date());
+	const [startTime, setStartTime] = useState("00:00");
+	const [endTime, setEndTime] = useState("00:00");
+
 	const [priority, setPriority] = useState<number>(1);
 
 	const [addError, setError] = useState<string>("");
@@ -99,6 +104,11 @@ export default function AddTask() {
 		);
 	};
 
+	const timeToMinutes = (time: string) => {
+		const [h, m] = time.split(":").map(Number);
+		return h * 60 + m;
+	};
+
 	const errorCheck = () => {
 		if (!taskTitle) {
 			setError("請輸入任務名稱");
@@ -115,6 +125,21 @@ export default function AddTask() {
 			setErrorCode(3);
 			return false;
 		}
+
+		const sameDay =
+			startDate.toDateString() === endDate.toDateString();
+
+		if (sameDay) {
+			const startMin = timeToMinutes(startTime);
+			const endMin = timeToMinutes(endTime);
+
+			if (startMin >= endMin) {
+				setError("同一天時，開始時間必須早於結束時間");
+				setErrorCode(3);
+				return false;
+			}
+		}
+
 		if (selectedUserIds.length === 0) {
 			setError("請至少選擇一名任務成員");
 			setErrorCode(4);
@@ -136,14 +161,30 @@ export default function AddTask() {
 		setErrorCode(0);
 	}
 
+	const combineDateTime = (date: Date, time: string) => {
+		const [hours, minutes] = time.split(":").map(Number);
+		const newDate = new Date(date);
+		newDate.setHours(hours);
+		newDate.setMinutes(minutes);
+		newDate.setSeconds(0);
+		return newDate;
+	};
+
 	const handleAdd = async () => {
 		if (!errorCheck()) return;
 
 		try {
 			setSubmitting(true);
 
-			await addTask(groupId, taskTitle, taskContent, priority,
-				startDate, endDate, selectedUserIds);
+			await addTask(
+				groupId,
+				taskTitle,
+				taskContent,
+				priority,
+				combineDateTime(startDate, startTime),
+				combineDateTime(endDate, endTime),
+				selectedUserIds
+			);
 
 			setVisible(false);
 			dataReset();
@@ -186,117 +227,132 @@ export default function AddTask() {
 
 					<View style={styles.modalView}>
 						<Text style={styles.modalTitle}>新增任務</Text>
+						<ScrollView
+							style={styles.formScroll}
+							contentContainerStyle={styles.formScrollContent}
+							showsVerticalScrollIndicator={false}
+							keyboardShouldPersistTaps="handled"
+						>
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務名稱</Text>
+								<TextInput
+									style={[styles.input, (errorCode == 1) && styles.errorInput]}
+									placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
+									placeholderTextColor={"#939393"}
+									value={taskTitle}
+									onChangeText={setTaskTitle}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務名稱</Text>
-							<TextInput
-								style={[styles.input, (errorCode == 1) && styles.errorInput]}
-								placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
-								placeholderTextColor={"#939393"}
-								value={taskTitle}
-								onChangeText={setTaskTitle}
-							/>
-						</View>
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務內容</Text>
+								<TextInput
+									style={[styles.input, (errorCode == 2) && styles.errorInput]}
+									placeholder="ex: 將程式完成並推上Github"
+									placeholderTextColor={"#939393"}
+									value={taskContent}
+									onChangeText={setTaskContent}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務內容</Text>
-							<TextInput
-								style={[styles.input, (errorCode == 2) && styles.errorInput]}
-								placeholder="ex: 將程式完成並推上Github"
-								placeholderTextColor={"#939393"}
-								value={taskContent}
-								onChangeText={setTaskContent}
-							/>
-						</View>
+							<View style={styles.inputRow}>
+								<DatePicker
+									label="開始日期"
+									value={startDate}
+									onChange={setStartDate}
+									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
+								/>
+								<TimePicker
+									value={startTime}
+									onChange={setStartTime}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<DatePicker
-								label="開始日期"
-								value={startDate}
-								onChange={setStartDate}
-								pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
-							/>
-						</View>
+							<View style={styles.inputRow}>
+								<DatePicker
+									label="結束日期"
+									value={endDate}
+									onChange={setEndDate}
+									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
+								/>
+								<TimePicker
+									value={endTime}
+									onChange={setEndTime}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<DatePicker
-								label="結束日期"
-								value={endDate}
-								onChange={setEndDate}
-								pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
-							/>
-						</View>
-
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務優先度</Text>
-							<View style={styles.priorPicker}>
-								<RNPickerSelect
-									onValueChange={(itemValue, itemIndex) =>
-										setPriority(itemValue)
-									}
-									placeholder={{}}
-									items={[
-										{ label: '1 (高度優先)', value: 1 },
-										{ label: '2 (中高度優先)', value: 2 },
-										{ label: '3 (中度優先)', value: 3 },
-										{ label: '4 (中低度優先)', value: 4 },
-										{ label: '5 (低度優先)', value: 5 },
-									]}
-									style={{
-										inputIOS: styles.pickerInputIOS,
-										inputIOSContainer: {
-											zIndex: 100,
-										},
-									}}
-									pickerProps={{
-										itemStyle: {
-											color: 'black'
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務優先度</Text>
+								<View style={styles.priorPicker}>
+									<RNPickerSelect
+										onValueChange={(itemValue, itemIndex) =>
+											setPriority(itemValue)
 										}
+										placeholder={{}}
+										items={[
+											{ label: '1 (高度優先)', value: 1 },
+											{ label: '2 (中高度優先)', value: 2 },
+											{ label: '3 (中度優先)', value: 3 },
+											{ label: '4 (中低度優先)', value: 4 },
+											{ label: '5 (低度優先)', value: 5 },
+										]}
+										style={{
+											inputIOS: styles.pickerInputIOS,
+											inputIOSContainer: {
+												zIndex: 100,
+											},
+										}}
+										pickerProps={{
+											itemStyle: {
+												color: 'black'
+											}
+										}}
+									/>
+								</View>
+							</View>
+
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務成員</Text>
+								{isLoading &&
+									<View>
+										<Loading />
+										<Text style={styles.loadingText}>載入成員中...</Text>
+									</View>
+								}
+
+								{error ? <Text>{error.message}</Text> : null}
+
+							<View style={styles.memberList}>
+								{groupMembers?.map((item) => (
+									<View key={item.id}>
+										{renderMember({ item })}
+									</View>
+								))}
+							</View>
+							</View>
+
+							{addError ? <Text style={styles.error}>{addError}</Text> : null}
+
+							<View style={styles.buttonRow}>
+								<Button
+									buttonStyle={[styles.button, styles.join]}
+									textStyle={styles.buttonText}
+									title="新增"
+									onPress={handleAdd}
+									loading={isSubmitting}
+								/>
+
+								<Button
+									buttonStyle={[styles.button, styles.cancel]}
+									textStyle={styles.buttonText}
+									title="取消"
+									onPress={() => {
+										dataReset();
+										setVisible(false);
 									}}
 								/>
 							</View>
-						</View>
-
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務成員</Text>
-							{isLoading &&
-								<View>
-									<Loading />
-									<Text style={styles.loadingText}>載入成員中...</Text>
-								</View>
-							}
-
-							{error ? <Text>{error.message}</Text> : null}
-
-							<FlatList
-								data={groupMembers}
-								keyExtractor={(item) => item.id}
-								renderItem={renderMember}
-								showsVerticalScrollIndicator={false}
-							/>
-						</View>
-
-						{addError ? <Text style={styles.error}>{addError}</Text> : null}
-
-						<View style={styles.buttonRow}>
-							<Button
-								buttonStyle={[styles.button, styles.join]}
-								textStyle={styles.buttonText}
-								title="新增"
-								onPress={handleAdd}
-								loading={isSubmitting}
-							/>
-
-							<Button
-								buttonStyle={[styles.button, styles.cancel]}
-								textStyle={styles.buttonText}
-								title="取消"
-								onPress={() => {
-									dataReset();
-									setVisible(false);
-								}}
-							/>
-						</View>
+						</ScrollView>
 					</View>
 				</View>
 			</Modal>
@@ -313,6 +369,7 @@ const styles = StyleSheet.create({
 	},
 	modalView: {
 		width: "95%",
+		maxHeight: "85%",
 		backgroundColor: "white",
 		borderRadius: 16,
 		padding: 20,
@@ -320,6 +377,15 @@ const styles = StyleSheet.create({
 		boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.25)',
 
 		elevation: 5,
+	},
+	formScroll: {
+		width: "100%",
+	},
+	formScrollContent: {
+		paddingBottom: 20,
+	},
+	memberList: {
+		maxHeight: 180,
 	},
 	modalTitle: {
 		fontSize: 18,
@@ -412,7 +478,8 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		marginBottom: 10,
 		color: "#E43636",
-		fontWeight: 'bold'
+		fontWeight: 'bold',
+		alignSelf: 'center'
 	},
 	errorInput: {
 		borderColor: "#E43636"
