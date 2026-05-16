@@ -182,7 +182,9 @@ const styles = StyleSheet.create({
 	displayArea: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
 	mainLabel: { fontSize: 14, fontWeight: '700', color: '#212529', textAlign: 'center', minWidth: 120 },
 
-	dateChip: { borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5 },
+	dateChip: {
+		borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, boxShadow: '1px 1px 3px rgba(0, 0, 0, 0.18)',
+	},
 	chipText: { fontSize: 12, color: 'coral', fontWeight: 'bold' },
 
 	customDialogContainer: {
