@@ -22,7 +22,7 @@ export default function GroupLayout() {
 					headerLeft: () => (
 						<Pressable
 							onPress={() => {
-								router.replace('/');
+								router.back();
 							}}
 							style={{ paddingHorizontal: 12 }}
 						>
@@ -38,7 +38,7 @@ export default function GroupLayout() {
 					headerTitleAlign: 'center',
 					headerLeft: () => (
 						<PressableOpacity
-							onPress={() => router.replace({
+							onPress={() => router.push({
 								pathname: `/groups/[groupId]/calendar`,
 								params: { groupId },
 							})}

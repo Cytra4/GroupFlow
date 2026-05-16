@@ -4,6 +4,7 @@ import JoinGroup from '@/components/JoinGroup';
 import { DialogRef } from '@/components/UI/BaseDialog';
 import PressableEffect from '@/components/UI/PressableEffect';
 import { useUserGroups } from '@/lib/hooks/idk/useGroups';
+import { useActiveTasksCount } from '@/lib/hooks/tasks/useActiveTasksCount';
 import { Group } from '@/types/supabase';
 import { Feather } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
@@ -22,6 +23,8 @@ function GenColorFromName(group_name: string) {
 export default function Index() {
 	const router = useRouter();
 	const { data: userGroups } = useUserGroups();
+	const { data: activeTaskCount } = useActiveTasksCount();
+
 	const createGroupRef = useRef<DialogRef>(null);
 
 	return (<>
@@ -39,7 +42,7 @@ export default function Index() {
 				>
 					<Text style={styles.text}>查看任務</Text>
 					<View style={styles.badge}>
-						<Text style={styles.badgeText}>3</Text>
+						<Text style={styles.badgeText}>{activeTaskCount}</Text>
 					</View>
 				</PressableEffect>
 
@@ -107,7 +110,7 @@ function GroupListScreen({ userGroups }: { userGroups: Group[] | undefined }) {
 						created_at={new Date(item.created_at)}
 						headerColor={GenColorFromName(item.name)}
 						onPress={() => {
-							router.replace({
+							router.push({
 								pathname: `/groups/[groupId]/calendar`,
 								params: { groupId: item.id },
 							});

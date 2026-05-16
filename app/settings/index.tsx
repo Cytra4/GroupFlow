@@ -36,7 +36,6 @@ export default function SettingsIndex() {
 				<Text style={{ color: "coral", fontWeight: 'bold' }}>登出</Text>
 			</SettingsSection>
 
-			{/* 💡 4. 將彈窗放置在畫面最外層 */}
 			<ConfirmDialog
 				ref={logoutDialogRef}
 				confirmText="確認"

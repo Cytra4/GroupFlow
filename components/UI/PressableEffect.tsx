@@ -37,7 +37,7 @@ const PressableEffect: React.FC<PressableEffectProps> = ({
 	return (
 		<Pressable
 			onPressIn={handlePressIn}
-			onPress={onPress} // 💡 修正點：直接改回標準的 onPress，不要用 onPressOut
+			onPress={onPress}
 			style={[style, { overflow: 'hidden' }]}
 		>
 			<Animated.View style={[StyleSheet.absoluteFillObject, { backgroundColor }]} />
