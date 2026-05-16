@@ -144,7 +144,7 @@ export default function GroupCalendar() {
 							<CustomDay
 								date={date}
 								onDayPress={() => {
-									router.replace({
+									router.push({
 										pathname: '/groups/[groupId]/dayDetail/[date]',
 										params: { groupId, date: dateString }
 									})

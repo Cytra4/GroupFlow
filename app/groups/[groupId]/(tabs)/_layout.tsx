@@ -12,7 +12,7 @@ export default function _layout() {
 				headerTitleAlign: "center",
 				headerLeft: () => (
 					<PressableOpacity
-						onPress={() => router.back()}
+						onPress={() => router.dismiss()}
 					>
 						<Feather
 							name="arrow-left"

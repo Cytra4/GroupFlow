@@ -40,16 +40,12 @@ function RootLayout() {
 		setMounted(true);
 	}, []);
 
-	// 修正後的路由防護邏輯
 	useEffect(() => {
 		if (!mounted || isAuthChecking) return;
 
 		if (!user) {
-			// 1. 沒登入，強制踢到登入頁
 			router.replace('/login');
 		} 
-		// 2. 💡 已登入的情況下，熱更新時「什麼都不要做」！
-		// 刪除原本的 else { router.dismissAll(); }，這樣就不會亂跳回首頁
 		
 	}, [user, mounted, isAuthChecking]); 
 

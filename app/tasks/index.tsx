@@ -4,7 +4,7 @@ import PressableEffect from '@/components/UI/PressableEffect';
 import { useMyTasks } from '@/lib/hooks/tasks/useMyTasks';
 import { groupTasksByDate } from '@/lib/utils/groupTaskByDate';
 import { Task } from '@/types/supabase';
-import { endOfMonth, format, formatISO, parseISO, startOfMonth } from 'date-fns';
+import { endOfMonth, format, formatISO, isWithinInterval, parseISO, startOfMonth } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -114,34 +114,68 @@ const TaskDialogProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const open = (task: Task | null) => {
 		setActiveTask(task);
-		if (task) dialogRef.current?.open();
+		dialogRef.current?.open();
+
+		console.log(task);
 	};
+	const config = PRIORITY_MAP[activeTask?.priority ?? 0] || DEFAULT_PRIORITY;
+	const status = activeTask ? getStatus(activeTask) : '';
+
 
 	return (
 		<TaskDialogContext value={open}>
 			{children}
 			<BaseDialog ref={dialogRef}>
 				{activeTask && (
-					<View>
-						<Text>{activeTask.title}</Text>
-						<Text>{activeTask.description || "暫無描述"}</Text>
+					<View style={{ gap: 10 }}>
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+							{/* 左側區塊：標題與標籤 */}
+							<View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+								<Text style={{ fontWeight: 'bold', fontSize: 18, lineHeight: 20 }}>{activeTask.title}</Text>
+								<Text style={{ backgroundColor: config.bgColor, color: config.color, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5, overflow: 'hidden', lineHeight: 20 }}>
+									{config.label}
+								</Text>
+							</View>
 
-						<Text>
-							{format(formatISO(activeTask.start_date), 'yyyy/MM/dd')}
-							~
-							{format(formatISO(activeTask.due_date), 'yyyy/MM/dd')}
-						</Text>
+							{/* 右側區塊：狀態小圓點與文字 */}
+							<View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+								<View style={{ height: 6, width: 6, borderRadius: 3, backgroundColor: status == "進行中" ? 'green' : 'gray' }} />
+								<Text style={{ fontSize: 14, includeFontPadding: false, textAlignVertical: 'center' }}>
+									{status}
+								</Text>
+							</View>
+						</View>
 
-						<Text>優先級: {activeTask.priority}</Text>
-						<Text>狀態: {activeTask.status}</Text>
-						<Pressable
-							onPress={() => {
-								router.push(`/groups/${activeTask.group_id}/mission`);
-								dialogRef.current?.close();
-							}}
-						>
-							<Text>前往群組</Text>
-						</Pressable>
+						<Text style={{ color: '#666' }}>{activeTask.description}</Text>
+
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+
+							<View style={{ alignItems: 'flex-start' }}>
+								<Text style={{ color: '#999' }}>
+									{format(formatISO(activeTask.start_date), 'yyyy/MM/dd ')}
+									~
+									{format(formatISO(activeTask.due_date), ' yyyy/MM/dd')}
+								</Text>
+							</View>
+							<Pressable
+								onPress={() => {
+									router.push({
+										pathname: `/groups/[groupId]/(tabs)/mission`,
+										params: { groupId: activeTask.group_id }
+									});
+									dialogRef.current?.close();
+								}}
+								style={{
+									backgroundColor: 'coral',
+									paddingHorizontal: 10,
+									paddingVertical: 6,
+									borderRadius: 6,
+								}}
+							>
+								<Text style={{ color: '#fff', fontWeight: 'bold' }}>前往群組</Text>
+							</Pressable>
+						</View>
+
 					</View>
 				)}
 			</BaseDialog>
@@ -158,7 +192,6 @@ const TaskOverview = () => {
 
 	const groupedData = React.useMemo(() => {
 		const allGroups = groupTasksByDate(tasksQuery.data || []);
-
 		const startString = format(range.start, 'yyyy-MM-dd');
 		const endString = format(range.end, 'yyyy-MM-dd');
 
@@ -166,6 +199,32 @@ const TaskOverview = () => {
 			(group) => group.dateLabel >= startString && group.dateLabel <= endString
 		);
 	}, [tasksQuery.data, range]);
+
+	const listRef = React.useRef<FlatList>(null);
+	const isInitialScrollDone = React.useRef(false);
+
+	React.useEffect(() => {
+		if (tasksQuery.isPending || groupedData.length === 0 || isInitialScrollDone.current) return;
+
+		const now = new Date();
+		// 確保今天確實在目前的 range 內才執行滾動
+		if (isWithinInterval(now, { start: range.start, end: range.end })) {
+			const todayString = format(now, 'yyyy-MM-dd');
+			const todayIndex = groupedData.findIndex(item => item.dateLabel === todayString);
+
+			if (todayIndex !== -1) {
+				setTimeout(() => {
+					listRef.current?.scrollToIndex({
+						index: todayIndex,
+						animated: true,
+						viewPosition: 0 // 完美置頂
+					});
+					isInitialScrollDone.current = true; // 鎖定旗標，此後 range 改變不再干擾
+				}, 100);
+			}
+		}
+	}, [groupedData, range, tasksQuery.isPending]);
+
 
 	return (
 		<View style={styles.container}>
@@ -183,13 +242,30 @@ const TaskOverview = () => {
 						</View>
 					) : (
 						<FlatList
+							ref={listRef}
 							data={groupedData}
 							keyExtractor={(item) => item.dateLabel}
 							contentContainerStyle={styles.list}
 
+							onScrollToIndexFailed={(info) => {
+								// 讓 FlatList 先自動滾動到大概的位置，使其強制加載該區塊的 UI
+								listRef.current?.scrollToOffset({
+									offset: info.averageItemLength * info.index,
+									animated: false,
+								});
+								// 加載完成後，立馬精準校正置頂
+								setTimeout(() => {
+									listRef.current?.scrollToIndex({
+										index: info.index,
+										animated: true,
+										viewPosition: 0,
+									});
+								}, 60);
+							}}
+
 							ListEmptyComponent={
 								<View style={styles.emptyContainer}>
-									<Text style={styles.emptyText}>當前選取區間內無任務</Text>
+									<Text style={styles.emptyText}>該時段尚無任務</Text>
 								</View>
 							}
 							renderItem={({ item }) => {
@@ -205,7 +281,7 @@ const TaskOverview = () => {
 										<View style={styles.bar}></View>
 									</View>
 
-									{item.tasks.map(task => (
+									{item.tasks.map((task: Task) => (
 										<TaskCard
 											key={`${item.dateLabel}-${task.id}`}
 											task={task}
@@ -276,4 +352,3 @@ const styles = StyleSheet.create({
 		backgroundColor: '#ccc',
 	}
 });
-

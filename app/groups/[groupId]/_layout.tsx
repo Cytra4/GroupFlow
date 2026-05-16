@@ -18,7 +18,6 @@ export default function GroupLayout() {
 					headerTitle: '小組',
 					headerTitleAlign: 'center',
 
-					// 左上角返回 index
 					headerLeft: () => (
 						<Pressable
 							onPress={() => {

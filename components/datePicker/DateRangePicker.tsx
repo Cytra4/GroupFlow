@@ -42,7 +42,7 @@ export default function DateRangePicker({ range, onChange }: DateRangePickerProp
 
 	const handleOpenPicker = (mode: 'start' | 'end') => {
 		setPickerMode(mode);
-		dialogRef.current?.open(); 
+		dialogRef.current?.open();
 	};
 
 	const handleSelectMonth = (year: number, month: number) => {
@@ -63,13 +63,13 @@ export default function DateRangePicker({ range, onChange }: DateRangePickerProp
 				};
 			}
 		});
-		dialogRef.current?.close();
+		// dialogRef.current?.close();
 	};
 
 	return (
 		<View style={styles.rangeSelector}>
-			<PressableEffect 
-				style={styles.arrowButton} 
+			<PressableEffect
+				style={styles.arrowButton}
 				onPress={() => shiftMonthRange(-1)}
 				activeColor="#FFF0E6"
 			>
@@ -77,8 +77,8 @@ export default function DateRangePicker({ range, onChange }: DateRangePickerProp
 			</PressableEffect>
 
 			<View style={styles.displayArea}>
-				<PressableEffect 
-					style={styles.dateChip} 
+				<PressableEffect
+					style={styles.dateChip}
 					onPress={() => handleOpenPicker('start')}
 					initialColor="#FFF0E6"
 					activeColor="#ffcdab"
@@ -88,8 +88,8 @@ export default function DateRangePicker({ range, onChange }: DateRangePickerProp
 
 				<Text style={styles.mainLabel}>{rangeLabel}</Text>
 
-				<PressableEffect 
-					style={styles.dateChip} 
+				<PressableEffect
+					style={styles.dateChip}
 					onPress={() => handleOpenPicker('end')}
 					initialColor="#FFF0E6"
 					activeColor="#ffcdab"
@@ -98,8 +98,8 @@ export default function DateRangePicker({ range, onChange }: DateRangePickerProp
 				</PressableEffect>
 			</View>
 
-			<PressableEffect 
-				style={styles.arrowButton} 
+			<PressableEffect
+				style={styles.arrowButton}
 				onPress={() => shiftMonthRange(1)}
 				activeColor='#FFF0E6'
 			>
@@ -114,8 +114,8 @@ export default function DateRangePicker({ range, onChange }: DateRangePickerProp
 					<Text style={styles.pickerTitle}>
 						{pickerMode === 'start' ? '設定開始月份' : '設定結束月份'}
 					</Text>
-					<PressableEffect 
-						style={styles.closeButton} 
+					<PressableEffect
+						style={styles.closeButton}
 						onPress={() => dialogRef.current?.close()}
 						activeColor="#f1f3f5"
 					>
@@ -167,55 +167,55 @@ export default function DateRangePicker({ range, onChange }: DateRangePickerProp
 }
 
 const styles = StyleSheet.create({
-	rangeSelector: { 
-		flexDirection: 'row', 
-		alignItems: 'center', 
-		backgroundColor: '#fff', 
-		borderRadius: 14, 
+	rangeSelector: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		borderRadius: 14,
 		marginVertical: 10,
 		borderWidth: 1,
 		borderColor: '#e9ecef',
-		overflow: 'hidden' 
+		overflow: 'hidden'
 	},
 	arrowButton: { paddingHorizontal: 14, paddingVertical: 12, borderRadius: 8 },
-	arrowText: { fontSize: 15, color: 'coral', fontWeight: 'bold' }, // 🎯 直接指定字串 coral
+	arrowText: { fontSize: 15, color: 'coral', fontWeight: 'bold' },
 	displayArea: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
 	mainLabel: { fontSize: 14, fontWeight: '700', color: '#212529', textAlign: 'center', minWidth: 120 },
-	
+
 	dateChip: { borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5 },
-	chipText: { fontSize: 12, color: 'coral', fontWeight: 'bold' }, // 🎯 直接指定字串 coral
-	
+	chipText: { fontSize: 12, color: 'coral', fontWeight: 'bold' },
+
 	customDialogContainer: {
 		width: '90%',
-		height: '60%', 
+		height: '60%',
 		borderRadius: 20,
-		padding: 0, 
+		padding: 0,
 		overflow: 'hidden',
 	},
-	pickerHeader: { 
-		flexDirection: 'row', 
-		justifyContent: 'space-between', 
-		alignItems: 'center', 
-		paddingLeft: 18, 
-		paddingRight: 8, 
+	pickerHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		paddingLeft: 18,
+		paddingRight: 8,
 		paddingVertical: 12,
-		borderBottomWidth: 1, 
+		borderBottomWidth: 1,
 		borderColor: '#f1f3f5',
 		backgroundColor: '#fff'
 	},
 	pickerTitle: { fontSize: 16, fontWeight: '700', color: '#212529' },
 	closeButton: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
 	closeText: { fontSize: 15, fontWeight: '600', color: '#868e96' },
-	
+
 	formScroll: { flex: 1, backgroundColor: '#fff' },
 	formScrollContent: { paddingVertical: 16, paddingHorizontal: 16 },
 	yearSection: { marginBottom: 20 },
 	yearTitle: { fontSize: 16, fontWeight: '800', color: '#495057', marginBottom: 10 },
-	activeYearTitle: { color: 'coral' }, 
-	monthGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-	
+	activeYearTitle: { color: 'coral' },
+	monthGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, justifyContent: 'center' },
+
 	monthChip: {
-		width: '23%', 
+		width: '23%',
 		borderRadius: 10,
 		paddingVertical: 12,
 		alignItems: 'center',
