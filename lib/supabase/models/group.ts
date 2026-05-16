@@ -50,6 +50,7 @@ export function useJoinGroup() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["groups"] });
+			queryClient.invalidateQueries({ queryKey: ["group_logs"] });
 		},
 	});
 }

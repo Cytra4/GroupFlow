@@ -82,6 +82,10 @@ export function useUpdateTask() {
 			queryClient.invalidateQueries({
 				queryKey: ["user_tasks", groupId],
 			});
+
+			queryClient.invalidateQueries({
+				queryKey: ["group_logs", groupId]
+			});
 		}
 	})
 }
