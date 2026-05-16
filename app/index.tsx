@@ -4,11 +4,12 @@ import JoinGroup from '@/components/JoinGroup';
 import { DialogRef } from '@/components/UI/BaseDialog';
 import PressableEffect from '@/components/UI/PressableEffect';
 import { useUserGroups } from '@/lib/hooks/idk/useGroups';
+import { hp } from '@/scripts/constants';
 import { Group } from '@/types/supabase';
 import { Feather } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import React, { useRef } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TextInput, View } from 'react-native';
 
 function GenColorFromName(group_name: string) {
 	let hash = 0;
@@ -70,6 +71,24 @@ function IndexHeader() {
 	);
 }
 
+function EmptyGroupsHint() {
+	return (
+		<View style={emptyStyles.container}>
+			<Image
+				source={require("../assets/images/thinking_emoji.png")}
+				resizeMode="contain"
+				style={{
+					height: hp(15)
+				}}
+			/>
+			<Text style={emptyStyles.title}>你好像還沒有任何小組</Text>
+			<Text style={emptyStyles.desc}>
+				趕快建立你的小組，或輸入代碼加入小組吧！
+			</Text>
+		</View>
+	);
+}
+
 function GroupListScreen({ userGroups }: { userGroups: Group[] | undefined }) {
 	const [searchQuery, setSearchQuery] = React.useState('');
 	const filteredGroups = userGroups?.filter((group) =>
@@ -114,6 +133,7 @@ function GroupListScreen({ userGroups }: { userGroups: Group[] | undefined }) {
 						}}
 					/>
 				)}
+				ListEmptyComponent={<EmptyGroupsHint />}
 			/>
 		</View>
 	);
@@ -121,19 +141,19 @@ function GroupListScreen({ userGroups }: { userGroups: Group[] | undefined }) {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1, // 💡 讓最外層撐滿螢幕
+		flex: 1,
 		flexDirection: "column",
 		backgroundColor: "#f2f5f8",
 	},
 	topActionRow: {
 		flexDirection: 'row',
 		gap: 20,
-		paddingHorizontal: 30, // 💡 移至此處統一對齊
+		paddingHorizontal: 30,
 		marginTop: 20,
 		marginBottom: 10,
 	},
 	listContainer: {
-		flex: 1, // 💡 重要：分配賸餘的所有高度給列表容器
+		flex: 1,
 		paddingHorizontal: 30,
 	},
 	btn: {
@@ -196,5 +216,26 @@ const groupStyles = StyleSheet.create({
 		borderWidth: 1,
 		boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.05)',
 		elevation: 2,
+	},
+});
+
+const emptyStyles = StyleSheet.create({
+	container: {
+		marginTop: 60,
+		alignItems: "center",
+		justifyContent: "center",
+		paddingHorizontal: 30,
+	},
+	title: {
+		fontSize: 20,
+		fontWeight: "bold",
+		marginBottom: 8,
+		textAlign: "center",
+	},
+	desc: {
+		fontSize: 14,
+		color: "#444",
+		textAlign: "center",
+		lineHeight: 20,
 	},
 });
