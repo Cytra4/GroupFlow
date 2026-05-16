@@ -63,12 +63,16 @@ export default function TimePicker({ value, onChange }: Props) {
 					theme: "light",
 					pickerColumnWidth: {
 						hours: 90,
+						minutes: 90,
 					},
 					contentContainer: {
-						width: wp(70),
+						alignSelf: 'center',
+						minWidth: wp(70),
 					},
 					pickerContainer: {
-						justifyContent: "center",
+						justifyContent: 'center',
+						alignItems: 'center',
+						marginRight: 0,
 					},
 				}}
 				visible={showPicker}

@@ -1,10 +1,14 @@
 import { useAvatarUpload } from "@/lib/hooks/utils/useAvatarUpload";
 import { supabase } from "@/lib/supabase/client";
 import { useAddComment, useComments } from "@/lib/supabase/models/comments";
+import { deleteComment, deleteDiscussion } from "@/lib/supabase/models/deleteComment";
+import { formatRelativeTime } from "@/lib/utils/formatRelativeTime";
+import { useAuth } from "@/scripts/AuthContext";
 import { Discussion } from "@/types/supabase";
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
+	Alert,
 	Image,
 	Modal,
 	Pressable,
@@ -29,19 +33,23 @@ type DiscussionCardProps = {
   discussion: Discussion;
   isOpen: boolean;
   onToggle: () => void;
+  onDeleted?: () => void;
 };
 
 export default function DiscussionCard({
   discussion,
   isOpen,
   onToggle,
+  onDeleted,
 }: DiscussionCardProps) {
   const { comments = [], refetch } = useComments(discussion.id);
   const { addComment } = useAddComment();
+  const { user } = useAuth();
   const [replyText, setReplyText] = useState("");
   const [replyImageUri, setReplyImageUri] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState("");
+  const [isPressed, setIsPressed] = useState(false);
   const uploadavatar = replyImageUri ? useAvatarUpload(
     replyImageUri,
     `comment_${discussion.id}_${Date.now()}`,
@@ -95,6 +103,50 @@ export default function DiscussionCard({
     setReplyImageUri("");
     refetch();
   };
+
+  const handleDeleteDiscussion = () => {
+    Alert.alert(
+      "刪除討論",
+      "確定要刪除這個討論嗎？此操作無法復原。",
+      [
+        { text: "取消", onPress: () => {}, style: "cancel" },
+        {
+          text: "刪除",
+          onPress: async () => {
+            try {
+              await deleteDiscussion(discussion.id);
+              onDeleted?.();
+            } catch (error) {
+              Alert.alert("錯誤", "刪除失敗，請稍後重試");
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
+
+  const handleDeleteComment = (commentId: number) => {
+    Alert.alert(
+      "刪除回覆",
+      "確定要刪除這個回覆嗎？此操作無法復原。",
+      [
+        { text: "取消", onPress: () => {}, style: "cancel" },
+        {
+          text: "刪除",
+          onPress: async () => {
+            try {
+              await deleteComment(commentId);
+              refetch();
+            } catch (error) {
+              Alert.alert("錯誤", "刪除失敗，請稍後重試");
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
   const openImageModal = (uri: string) => {
     setSelectedImageUri(uri);
     setModalVisible(true);
@@ -105,8 +157,18 @@ export default function DiscussionCard({
     borderColors[0];
 
   return (
-    <View style={[styles.card, { borderColor }]}>
-    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+    <Pressable
+	  onPressIn={() => setIsPressed(true)}
+	  onPressOut={() => setIsPressed(false)}
+      onLongPress={() => {
+        if (user?.id === discussion.user_id) {
+          handleDeleteDiscussion();
+        }
+      }}
+      style={styles.cardContainer}
+    >
+      <View style={[styles.card, { borderColor }, isPressed && styles.cardPressed]}>
+        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
       <Image
         source={{ uri: discussion.profiles?.avatarUrl || "https://picsum.photos/200" }}
         style={styles.profileImage}
@@ -128,7 +190,7 @@ export default function DiscussionCard({
 
       <View style={styles.metaRow}>  
         <Text style={styles.time}>
-          {new Date(discussion.created_at).toLocaleString()}
+          {formatRelativeTime(discussion.created_at)}
         </Text>
       </View>
       <Text onPress={onToggle} style={styles.toggleText}>
@@ -138,7 +200,15 @@ export default function DiscussionCard({
       {isOpen && (
         <View style={styles.replySection}>
           {comments.map((comment) => (
-            <View key={comment.id} style={styles.commentRow}>
+            <Pressable
+              key={comment.id}
+              style={styles.commentRow}
+              onPressOut={() => {
+                if (user?.id === comment.user_id) {
+                  handleDeleteComment(comment.id);
+                }
+              }}
+            >
 				<View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
 					<Image
 						source={{ uri: comment.profiles?.avatarUrl || "https://picsum.photos/200" }}
@@ -158,9 +228,9 @@ export default function DiscussionCard({
                 </TouchableOpacity>
               ) : null}
               <Text style={styles.commentTime}>
-                {new Date(comment.created_at).toLocaleString()}
+                {formatRelativeTime(comment.created_at)}
               </Text>
-            </View>
+            </Pressable>
           ))}
 
           <TextInput
@@ -213,19 +283,29 @@ export default function DiscussionCard({
           />
         </TouchableOpacity>
       </Modal>
-    </View>
+      </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  cardContainer: {
+    marginBottom: 16,
+  },
   card: {
     backgroundColor: "#fffffff1",
     borderRadius: 12,
     padding: 16,
-    marginBottom: 16,
     borderWidth: 2,
-	boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
-    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  cardPressed: {
+    shadowOpacity: 0.2,
+    elevation: 12,
   },
   title: {
     fontWeight: "400",

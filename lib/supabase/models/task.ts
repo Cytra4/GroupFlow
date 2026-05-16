@@ -74,6 +74,10 @@ export function useAddNewTask() {
 			queryKey: ["tasks", groupID],
 		});
 
+		queryClient.invalidateQueries({
+			queryKey: ["group_logs", groupID],
+		});
+
 		return task;
 	};
 

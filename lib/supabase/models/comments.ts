@@ -1,3 +1,4 @@
+import { useAuth } from "@/scripts/AuthContext";
 import { Comment } from "@/types/supabase";
 import { useFetch, useInsert } from "../query";
 
@@ -6,6 +7,7 @@ export function useComments(discussionId: number) {
     select: `
       id,
       discussion_id,
+      user_id,
       content,
       avatarUrl,
       created_at,
@@ -22,6 +24,7 @@ export function useComments(discussionId: number) {
 
 export function useAddComment() {
   const insertMutation = useInsert();
+  const { user } = useAuth();
 
   const addComment = (
     discussionId: number,
@@ -32,6 +35,7 @@ export function useAddComment() {
       table: "comments",
       row: {
         discussion_id: discussionId,
+        user_id: user?.id,
         content,
         avatarUrl: avatarUrl,
         status: true,

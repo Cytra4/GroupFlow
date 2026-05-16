@@ -34,6 +34,8 @@ export function useLeaveGroupMutation() {
 		},
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: ["group_members"] });
+
+			qc.invalidateQueries({ queryKey: ["group_logs"]});
 		}
 	});
 }

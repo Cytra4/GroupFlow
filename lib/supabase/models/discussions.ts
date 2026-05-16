@@ -8,6 +8,7 @@ export function useDiscussions(groupId: string | undefined) {
 		select: `
       id,
       group_id,
+      user_id,
       title,
       content,
       status,
