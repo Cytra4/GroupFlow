@@ -7,12 +7,13 @@ import { Task } from "@/types/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
 import { Button } from "../Button";
 import { Loading } from "../Loading";
 import { PressableOpacity } from "../PressableOpacity";
 import DatePicker from "../datePicker/DatePicker";
+import TimePicker from "../datePicker/TimePicker";
 
 export default function TaskEdit(
 	{ iconColor, iconSize, iconStyle, taskData }
@@ -36,6 +37,16 @@ export default function TaskEdit(
 		taskData?.due_date ?
 			new Date(taskData?.due_date) :
 			new Date()
+	);
+	const [startTime, setStartTime] = useState<string>(
+		taskData?.start_date ?
+			`${startDate.getHours}:${startDate.getMinutes}` :
+			"00:00"
+	);
+	const [endTime, setEndTime] = useState<string>(
+		taskData?.due_date ?
+			`${endDate.getHours}:${endDate.getMinutes}` :
+			"00:00"
 	);
 	const [priority, setPriority] = useState<number>(taskData?.priority ?? 1);
 
@@ -257,127 +268,142 @@ export default function TaskEdit(
 					/>
 					<View style={[styles.modalView, { borderWidth: 3.5, borderColor: iconColor ?? "blue" }]}>
 						<Text style={styles.title}>修改任務</Text>
+						<ScrollView
+							style={styles.formScroll}
+							contentContainerStyle={styles.formScrollContent}
+							showsVerticalScrollIndicator={false}
+							keyboardShouldPersistTaps="handled"
+						>
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務名稱</Text>
+								<TextInput
+									style={[styles.input, (errorCode == 1) && styles.errorInput]}
+									placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
+									placeholderTextColor={"#939393"}
+									value={taskTitle}
+									onChangeText={setTaskTitle}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務名稱</Text>
-							<TextInput
-								style={[styles.input, (errorCode == 1) && styles.errorInput]}
-								placeholder="ex: 企劃書撰寫, 整理資料, 偷懶"
-								placeholderTextColor={"#939393"}
-								value={taskTitle}
-								onChangeText={setTaskTitle}
-							/>
-						</View>
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務內容</Text>
+								<TextInput
+									style={[styles.input, (errorCode == 2) && styles.errorInput]}
+									placeholder="ex: 將程式完成並推上Github"
+									placeholderTextColor={"#939393"}
+									value={taskContent}
+									onChangeText={setTaskContent}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務內容</Text>
-							<TextInput
-								style={[styles.input, (errorCode == 2) && styles.errorInput]}
-								placeholder="ex: 將程式完成並推上Github"
-								placeholderTextColor={"#939393"}
-								value={taskContent}
-								onChangeText={setTaskContent}
-							/>
-						</View>
+							<View style={styles.inputRow}>
+								<DatePicker
+									label="開始日期"
+									value={startDate}
+									onChange={setStartDate}
+									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
+								/>
+								<TimePicker
+									value={startTime}
+									onChange={setStartTime}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<DatePicker
-								label="開始日期"
-								value={startDate}
-								onChange={setStartDate}
-								pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
-							/>
-						</View>
+							<View style={styles.inputRow}>
+								<DatePicker
+									label="結束日期"
+									value={endDate}
+									onChange={setEndDate}
+									pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
+								/>
+								<TimePicker
+									value={endTime}
+									onChange={setEndTime}
+								/>
+							</View>
 
-						<View style={styles.inputRow}>
-							<DatePicker
-								label="結束日期"
-								value={endDate}
-								onChange={setEndDate}
-								pickerStyle={[styles.picker, (errorCode == 3) && styles.errorInput]}
-							/>
-						</View>
-
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務優先度</Text>
-							<View style={styles.priorPicker}>
-								<RNPickerSelect
-									onValueChange={(itemValue, itemIndex) =>
-										setPriority(itemValue)
-									}
-									placeholder={{}}
-									items={[
-										{ label: '1 (高度優先)', value: 1 },
-										{ label: '2 (中高度優先)', value: 2 },
-										{ label: '3 (中度優先)', value: 3 },
-										{ label: '4 (中低度優先)', value: 4 },
-										{ label: '5 (低度優先)', value: 5 },
-									]}
-									style={{
-										inputIOS: styles.pickerInputIOS,
-										inputIOSContainer: {
-											zIndex: 100,
-										},
-									}}
-									pickerProps={{
-										itemStyle: {
-											color: 'black'
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務優先度</Text>
+								<View style={styles.priorPicker}>
+									<RNPickerSelect
+										onValueChange={(itemValue, itemIndex) =>
+											setPriority(itemValue)
 										}
+										placeholder={{}}
+										items={[
+											{ label: '1 (高度優先)', value: 1 },
+											{ label: '2 (中高度優先)', value: 2 },
+											{ label: '3 (中度優先)', value: 3 },
+											{ label: '4 (中低度優先)', value: 4 },
+											{ label: '5 (低度優先)', value: 5 },
+										]}
+										style={{
+											inputIOS: styles.pickerInputIOS,
+											inputIOSContainer: {
+												zIndex: 100,
+											},
+										}}
+										pickerProps={{
+											itemStyle: {
+												color: 'black'
+											}
+										}}
+									/>
+								</View>
+							</View>
+
+							<View style={styles.inputRow}>
+								<Text style={styles.inputTitle}>任務成員</Text>
+								{isLoading &&
+									<View>
+										<Loading />
+										<Text style={styles.loadingText}>載入成員中...</Text>
+									</View>
+								}
+
+								{error ? <Text>{error.message}</Text> : null}
+
+								<View style={styles.memberList}>
+									{groupMembers?.map((item) => (
+										<View key={item.id}>
+											{renderMember({ item })}
+										</View>
+									))}
+								</View>
+							</View>
+
+							{addError ? <Text style={styles.error}>{addError}</Text> : null}
+
+							<View style={styles.buttonRow}>
+								<Button
+									buttonStyle={[styles.button, styles.join]}
+									textStyle={styles.buttonText}
+									title="更新任務"
+									onPress={handleUpdate}
+									loading={isSubmitting}
+								/>
+
+								{/* TO BE DONE */}
+								<Button
+									buttonStyle={[styles.button, styles.delete]}
+									textStyle={styles.buttonText}
+									title="刪除任務"
+									onPress={() => {
+										handleDeleteConfirm()
+									}}
+								/>
+
+								<Button
+									buttonStyle={[styles.button, styles.cancel]}
+									textStyle={styles.buttonText}
+									title="取消"
+									onPress={() => {
+										resetTaskData()
+										setVisible(false)
 									}}
 								/>
 							</View>
-						</View>
-
-						<View style={styles.inputRow}>
-							<Text style={styles.inputTitle}>任務成員</Text>
-							{isLoading &&
-								<View>
-									<Loading />
-									<Text style={styles.loadingText}>載入成員中...</Text>
-								</View>
-							}
-
-							{error ? <Text>{error.message}</Text> : null}
-
-							<FlatList
-								data={groupMembers}
-								keyExtractor={(item) => item.id}
-								renderItem={renderMember}
-								showsVerticalScrollIndicator={false}
-							/>
-						</View>
-
-						{addError ? <Text style={styles.error}>{addError}</Text> : null}
-
-						<View style={styles.buttonRow}>
-							<Button
-								buttonStyle={[styles.button, styles.join]}
-								textStyle={styles.buttonText}
-								title="更新任務"
-								onPress={handleUpdate}
-								loading={isSubmitting}
-							/>
-
-							{/* TO BE DONE */}
-							<Button
-								buttonStyle={[styles.button, styles.delete]}
-								textStyle={styles.buttonText}
-								title="刪除任務"
-								onPress={() => {
-									handleDeleteConfirm()
-								}}
-							/>
-
-							<Button
-								buttonStyle={[styles.button, styles.cancel]}
-								textStyle={styles.buttonText}
-								title="取消"
-								onPress={() => {
-									resetTaskData()
-									setVisible(false)
-								}}
-							/>
-						</View>
+						</ScrollView>
 					</View>
 				</View>
 			</Modal>
@@ -394,6 +420,7 @@ const styles = StyleSheet.create({
 	},
 	modalView: {
 		width: "95%",
+		maxHeight: "85%",
 		backgroundColor: "white",
 		borderRadius: 16,
 		padding: 20,
@@ -409,6 +436,15 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: "bold",
 		marginBottom: 12,
+	},
+	formScroll: {
+		width: "100%",
+	},
+	formScrollContent: {
+		paddingBottom: 20,
+	},
+	memberList: {
+		maxHeight: 180,
 	},
 	buttonRow: {
 		flexDirection: "row",

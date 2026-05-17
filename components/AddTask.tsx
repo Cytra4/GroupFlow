@@ -16,21 +16,6 @@ import { PressableOpacity } from "./PressableOpacity";
 // unfinished > start = 進行中
 // unfinished < start = 尚未開始
 
-function GetPriorityLabel(prior: number) {
-	switch (prior) {
-		case 1:
-			return "高度優先";
-		case 2:
-			return "中高度優先";
-		case 3:
-			return "中度優先";
-		case 4:
-			return "中低度優先";
-		default:
-			return "低度優先";
-	}
-}
-
 export default function AddTask() {
 	const [visible, setVisible] = useState(false);
 	const [taskTitle, setTaskTitle] = useState<string>("");
@@ -38,8 +23,8 @@ export default function AddTask() {
 
 	const [startDate, setStartDate] = useState<Date>(new Date());
 	const [endDate, setEndDate] = useState<Date>(new Date());
-	const [startTime, setStartTime] = useState("00:00");
-	const [endTime, setEndTime] = useState("00:00");
+	const [startTime, setStartTime] = useState<string>("00:00");
+	const [endTime, setEndTime] = useState<string>("00:00");
 
 	const [priority, setPriority] = useState<number>(1);
 
@@ -322,13 +307,13 @@ export default function AddTask() {
 
 								{error ? <Text>{error.message}</Text> : null}
 
-							<View style={styles.memberList}>
-								{groupMembers?.map((item) => (
-									<View key={item.id}>
-										{renderMember({ item })}
-									</View>
-								))}
-							</View>
+								<View style={styles.memberList}>
+									{groupMembers?.map((item) => (
+										<View key={item.id}>
+											{renderMember({ item })}
+										</View>
+									))}
+								</View>
 							</View>
 
 							{addError ? <Text style={styles.error}>{addError}</Text> : null}

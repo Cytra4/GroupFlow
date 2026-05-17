@@ -1,4 +1,5 @@
 import { Task } from "@/types/supabase";
+import { format, parseISO } from "date-fns";
 import { StyleSheet, Text, View } from "react-native";
 import TaskDetail from "./TaskDetail";
 import TaskEdit from "./mission/TaskEdit";
@@ -20,9 +21,9 @@ function getPriorityColor(priority: number) {
 }
 
 function GetDateRange(start_date: string, due_date: string) {
-	const s = start_date.replaceAll("-", "/");
-	const d = due_date.replaceAll("-", "/");
-	return `${s} ~ ${d}`;
+	const s = format(parseISO(start_date), "yyyy/MM/dd HH:mm")
+	const d = format(parseISO(due_date), "yyyy/MM/dd HH:mm")
+	return `開始: ${s} \n 結束: ${d}`;
 }
 
 export default function TaskCard({
