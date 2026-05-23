@@ -146,6 +146,7 @@ export default function AddDiscussion({
       animationType="slide"
       transparent
       onRequestClose={handleClose}
+	  statusBarTranslucent={true}
     >
       <Pressable style={styles.modalOverlay} onPress={handleClose}>
         <Pressable style={styles.modalView} onPress={() => null}>

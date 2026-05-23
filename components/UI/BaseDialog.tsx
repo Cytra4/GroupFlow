@@ -30,7 +30,12 @@ export const BaseDialog = forwardRef<DialogRef, BaseDialogProps>(
 		};
 
 		return (
-			<Modal transparent visible={visible} animationType="fade" onRequestClose={handleClose}>
+			<Modal 
+				transparent visible={visible} 
+				animationType="fade" 
+				onRequestClose={handleClose}
+				statusBarTranslucent={true}
+			>
 				<Pressable style={styles.overlay} onPress={handleClose}>
 					<Pressable
 						style={[styles.dialog, containerStyle]}
