@@ -38,14 +38,19 @@ export default function TaskEdit(
 			new Date(taskData?.due_date) :
 			new Date()
 	);
+
+	const formatTimeValue = (date: Date) =>
+		`${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+
 	const [startTime, setStartTime] = useState<string>(
 		taskData?.start_date ?
-			`${startDate.getHours}:${startDate.getMinutes}` :
+			formatTimeValue(startDate) :
 			"00:00"
 	);
+
 	const [endTime, setEndTime] = useState<string>(
 		taskData?.due_date ?
-			`${endDate.getHours}:${endDate.getMinutes}` :
+			formatTimeValue(endDate) :
 			"00:00"
 	);
 	const [priority, setPriority] = useState<number>(taskData?.priority ?? 1);
@@ -223,16 +228,12 @@ export default function TaskEdit(
 	const resetTaskData = () => {
 		setTaskTitle(taskData?.title ?? "");
 		setTaskContent(taskData?.description ?? "");
-		setStartDate(
-			taskData?.start_date ?
-				new Date(taskData?.start_date) :
-				new Date()
-		);
-		setEndDate(
-			taskData?.due_date ?
-				new Date(taskData?.due_date) :
-				new Date()
-		);
+		const resetStartDate = taskData?.start_date ? new Date(taskData?.start_date) : new Date();
+		const resetEndDate = taskData?.due_date ? new Date(taskData?.due_date) : new Date();
+		setStartDate(resetStartDate);
+		setEndDate(resetEndDate);
+		setStartTime(taskData?.start_date ? formatTimeValue(resetStartDate) : "00:00");
+		setEndTime(taskData?.due_date ? formatTimeValue(resetEndDate) : "00:00");
 		setPriority(taskData?.priority ?? 1);
 		if (taskMembersData) {
 			setSelectedUserIds(taskMembersData.map(m => m.user_id));
