@@ -5,28 +5,41 @@ import { Task } from "@/types/supabase";
 import { useGlobalSearchParams } from "expo-router";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 
-function GetTaskForToday(groupId: string, date: Date) {
-	const taskFetch = useTask(groupId);
-	const taskData = taskFetch['data'] ?? []
-	let result: Task[] = [];
+function getTasksForToday(taskData: Task[], date: Date) {
+	const result: Task[] = [];
 
 	taskData.forEach(element => {
-		const sDate = new Date(element['start_date']);
-		const dDate = new Date(element['due_date']);
-		if (date >= sDate && date <= dDate && element.status == "unfinished") result.push(element);
+		const sDate = new Date(element.start_date);
+		const dDate = new Date(element.due_date);
+		if (date >= sDate && date <= dDate && element.status === "unfinished") {
+			result.push(element);
+		}
 	});
 
-	result.sort((a,b) => a.priority - b.priority);
-
+	result.sort((a, b) => a.priority - b.priority);
 	return result;
 }
 
 export default function DayDetail() {
-	const { groupId, date } = useGlobalSearchParams();
-	const d = new Date(date.toString());
+	const params = useGlobalSearchParams<{ groupId: string; date: string }>();
+	const groupId = Array.isArray(params.groupId) ? params.groupId[0] : params.groupId;
+	const dateParam = Array.isArray(params.date) ? params.date[0] : params.date;
+
+	const taskFetch = useTask(groupId ?? "");
+	const taskData = taskFetch.data ?? [];
+
+	if (!groupId || !dateParam) {
+		return (
+			<View style={styles.container}>
+				<Text style={styles.dateText}>讀取中...</Text>
+			</View>
+		);
+	}
+
+	const d = new Date(dateParam);
 	const dateDisplay = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 
-	const taskToday = GetTaskForToday(groupId.toString(), d);
+	const taskToday = getTasksForToday(taskData, d);
 	return (
 		<View style={styles.container}>
 			<Text style={styles.dateText}>{dateDisplay}</Text>
