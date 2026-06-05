@@ -9,7 +9,7 @@ import { useGroupMembers } from '@/lib/hooks/useGroupMembers';
 import { UserRole } from '@/types/supabase';
 import { Tabs, useGlobalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function Information() {
     const router = useRouter();
@@ -80,7 +80,7 @@ export default function Information() {
             }}
         />
 
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.content}>
                 <Text style={styles.sectionTitle}>小組資訊</Text>
                 <View style={styles.section}>
@@ -104,29 +104,16 @@ export default function Information() {
                         <Text style={styles.title}>{groupData?.member_count}</Text>
                     </View>
                     <View style={styles.line} />
-                    <View style={[styles.sectionContent, { alignItems: 'center' }]}>
+                    <View style={styles.sectionContent}>
                         <Text style={[styles.label, { alignSelf: 'flex-start' }]}>小組成員</Text>
-                        <FlatList
-                            data={groupMembers}
-                            key={"_"}
-                            keyExtractor={(item) => item.id}
-                            renderItem={({ item }) => {
-                                return (
-                                    <View style={styles.memberRow}>
-                                        <Image
-                                            source={{ uri: item.profiles.avatarUrl || "https://picsum.photos/200" }}
-                                            style={styles.profilePic}
-                                        />
-
-                                        <Text style={styles.memberName}>
-                                            {item.profiles.username}
-                                        </Text>
-                                    </View>
-                                )
-                            }}
-                            showsVerticalScrollIndicator={false}
-                            numColumns={3}
-                        />
+                        <View style={styles.memberGrid}>
+                            {groupMembers?.map((m) => (
+                                <View key={m.id} style={styles.memberItem}>
+                                    <Image source={{ uri: m.profiles.avatarUrl || 'https://picsum.photos/200' }} style={styles.profilePic} />
+                                    <Text style={styles.memberName}>{m.profiles.username}</Text>
+                                </View>
+                            ))}
+                        </View>
                     </View>
                 </View>
             </View>
@@ -134,36 +121,25 @@ export default function Information() {
             <View style={styles.content}>
                 <Text style={styles.sectionTitle}>活動紀錄</Text>
                 <View style={styles.section}>
-                    {logData?.length === 0 ? (
-                        <Text style={{ color: 'gray', textAlign: 'center', marginVertical: 20, fontSize: 16 }}>
-                            尚無活動紀錄
-                        </Text>
-                    ) : (
-                        <FlatList
-                            data={logData}
-                            keyExtractor={item => item.id}
-                            renderItem={({ item, index }) => (
-                                <LogDisplay
-                                    logData={item}
-                                    isGroupRelated={item.target_type == "group"}
-                                />
-                            )}
-                            scrollEnabled={true}
-                            style={styles.list}
-                        />
-                    )}
-				</View>
+                    <ScrollView style={styles.logScroll} nestedScrollEnabled={true}>
+                        {logData?.map((log) => (
+                            <View key={log.id} style={styles.logItemInner}>
+                                <LogDisplay logData={log} isGroupRelated={log.target_type == 'group'} />
+                            </View>
+                        ))}
+                    </ScrollView>
+                </View>
             </View>
-        </View>
+        </ScrollView>
     </>);
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#f2f5f8",
+    scrollContainer: {
+        flexGrow: 1,
         alignItems: 'center',
-        padding: 8
+        padding: 8,
+        backgroundColor: '#f2f5f8',
     },
     content: {
         width: '85%',
@@ -200,32 +176,50 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     profilePic: {
-        width: 25,
-        height: 25,
-        borderRadius: 65,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         marginRight: 8
     },
-    memberRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        paddingVertical: 8,
-        marginHorizontal: 8
+    memberGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 8,
+        justifyContent: 'flex-start'
+    },
+    memberItem: {
+        width: '30%',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    memberName: {
+        marginTop: 6,
+        textAlign: 'center',
+        fontSize: 12,
     },
     leaveText: {
-        color: "coral",
+        color: 'coral',
         fontSize: 20,
         marginRight: 10,
-        fontWeight: "bold",
-        userSelect: "none"
+        fontWeight: 'bold',
     },
     leaveTextConfirm: {
-        color: "#E43636",
+        color: '#E43636',
         fontSize: 18,
-        fontWeight: "bold",
-        textAlign: "center"
+        fontWeight: 'bold',
+        textAlign: 'center'
     },
-    list: {
-        maxHeight: 200
+    logScroll: {
+        maxHeight: 300,
     },
-})
-
+    logItemInner: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderColor: '#eee'
+    },
+    logSectionPlaceholder: {
+        minHeight: 12,
+        borderWidth: 0,
+    }
+});
