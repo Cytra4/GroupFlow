@@ -150,6 +150,15 @@ export default function TaskEdit(
 		return true;
 	}
 
+	const combineDateTime = (date: Date, time: string) => {
+		const [hours, minutes] = time.split(":").map(Number);
+		const newDate = new Date(date);
+		newDate.setHours(hours);
+		newDate.setMinutes(minutes);
+		newDate.setSeconds(0);
+		return newDate;
+	};
+
 	const handleUpdate = async () => {
 		if (!errorCheck()) return;
 		if (!taskData) return;
@@ -162,8 +171,8 @@ export default function TaskEdit(
 				groupId: groupId,
 				taskTitle,
 				taskContent,
-				startDate,
-				endDate,
+				startDate: combineDateTime(startDate, startTime),
+				endDate: combineDateTime(endDate, endTime),
 				priority
 			});
 
