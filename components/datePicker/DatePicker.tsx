@@ -1,7 +1,7 @@
 import { hp, wp } from "@/scripts/constants";
-import { Picker } from "@react-native-picker/picker";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import RNPickerSelect from 'react-native-picker-select';
 
 type Props = {
 	label?: string;
@@ -10,6 +10,29 @@ type Props = {
 	minDate?: Date;
 	pickerStyle?: object;
 };
+
+const pickerSelectStyles = StyleSheet.create({
+	inputIOS: {
+		fontSize: 16,
+		paddingVertical: 10,
+		paddingHorizontal: 12,
+		color: 'black',
+		textAlign: 'center',
+	},
+	inputIOSContainer: {
+		zIndex: 100,
+	},
+	inputAndroid: {
+		fontSize: 16,
+		paddingVertical: 8,
+		paddingHorizontal: 12,
+		color: 'black',
+		textAlign: 'center',
+	},
+	pickerContainer: {
+		zIndex: 100,
+	},
+});
 
 export default function DatePicker({
 	label,
@@ -31,47 +54,75 @@ export default function DatePicker({
 		return new Date(year, month, 0).getDate();
 	}, [year, month]);
 
-	const updateDate = (y = year, m = month, d = day) => {
+	const monthItems = useMemo(() => {
+		return Array.from({ length: 12 }, (_, i) => ({ label: `${i + 1}月`, value: i + 1 }));
+	}, []);
+
+	const dayItems = useMemo(() => {
+		return Array.from({ length: daysInMonth }, (_, i) => ({ label: `${i + 1}日`, value: i + 1 }));
+	}, [daysInMonth]);
+
+	const yearItems = useMemo(() => {
+		return years.map((y) => ({ label: `${y}年`, value: y }));
+	}, [years]);
+
+	const updateDate = useCallback((y = year, m = month, d = day) => {
 		const next = new Date(y, m - 1, d);
 		if (minDate && next < minDate) return;
 		onChange(next);
-	};
+	}, [year, month, day, minDate, onChange]);
 
 	return (
 		<View style={styles.wrapper}>
 			{label && <Text style={styles.label}>{label}</Text>}
 			<View style={styles.row}>
-				<View style={[styles.pickerWrapper,{flex: 1.2},pickerStyle]}>
-					<Picker
-						selectedValue={year}
+				<View style={[styles.pickerWrapper, { flex: 1.2 }, pickerStyle]}>
+					<RNPickerSelect
+						value={year}
 						onValueChange={(y) => updateDate(y)}
-					>
-						{years.map((y) => (
-							<Picker.Item key={y} label={`${y}年`} value={y} />
-						))}
-					</Picker>
+						placeholder={{}}
+						items={yearItems}
+						style={pickerSelectStyles}
+						useNativeAndroidPickerStyle={false}
+						pickerProps={{
+							itemStyle: {
+								color: 'black'
+							}
+						}}
+						doneText="完成"
+					/>
 				</View>
-
-				<View style={[styles.pickerWrapper,{flex: 1},pickerStyle]}>
-					<Picker
-						selectedValue={month}
+				<View style={[styles.pickerWrapper, { flex: 1 }, pickerStyle]}>
+					<RNPickerSelect
+						value={month}
 						onValueChange={(m) => updateDate(undefined, m)}
-					>
-						{Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-							<Picker.Item key={m} label={`${m}月`} value={m} />
-						))}
-					</Picker>
+						placeholder={{}}
+						items={monthItems}
+						style={pickerSelectStyles}
+						useNativeAndroidPickerStyle={false}
+						pickerProps={{
+							itemStyle: {
+								color: 'black'
+							}
+						}}
+						doneText="完成"
+					/>
 				</View>
-
-				<View style={[styles.pickerWrapper,{flex: 1},pickerStyle]}>
-					<Picker
-						selectedValue={day}
+				<View style={[styles.pickerWrapper, { flex: 1 }, pickerStyle]}>
+					<RNPickerSelect
+						value={day}
 						onValueChange={(d) => updateDate(undefined, undefined, d)}
-					>
-						{Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
-							<Picker.Item key={d} label={`${d}日`} value={d} />
-						))}
-					</Picker>
+						placeholder={{}}
+						items={dayItems}
+						style={pickerSelectStyles}
+						useNativeAndroidPickerStyle={false}
+						pickerProps={{
+							itemStyle: {
+								color: 'black'
+							}
+						}}
+						doneText="完成"
+					/>
 				</View>
 			</View>
 		</View>
@@ -85,9 +136,11 @@ const styles = StyleSheet.create({
 	pickerWrapper: {
 		width: wp(30),
 		height: hp(6),
+		minHeight: 50,
 		margin: -1,
 		justifyContent: 'center',
-		alignContent: 'center'
+		alignContent: 'center',
+		zIndex: 100,
 	},
 	label: {
 		fontSize: 16,
