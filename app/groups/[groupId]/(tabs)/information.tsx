@@ -31,7 +31,7 @@ export default function Information() {
     function handleLeaveGroup() {
         leaveGroup.mutate(groupId, {
             onSuccess: () => {
-                router.back();
+                router.replace("/");
                 if (groupData?.member_count === 1) {
                     deleteGroup.mutate(groupId);
                 }

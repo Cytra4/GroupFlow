@@ -55,7 +55,7 @@ function RootLayout() {
 
 	return (
 		<Stack>
-			<Stack.Screen name="index" options={{ headerShown: true, headerTitle: "Group Flow", headerTitleAlign: "center" }} />
+			<Stack.Screen name="index" options={{ headerShown: true, headerTitle: "Group Flow", headerTitleAlign: "center", headerBackVisible: false}} />
 			<Stack.Screen name="groups/[groupId]" options={{ headerShown: false }} />
 			<Stack.Screen name="login" options={{ headerShown: false }} />
 			<Stack.Screen name="signUp" options={{ headerShown: false }} />
