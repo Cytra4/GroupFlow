@@ -37,10 +37,11 @@ export default function GroupLayout() {
 					headerTitleAlign: 'center',
 					headerLeft: () => (
 						<PressableOpacity
-							onPress={() => router.push({
-								pathname: `/groups/[groupId]/calendar`,
-								params: { groupId },
-							})}
+							// onPress={() => router.push({
+							// 	pathname: `/groups/[groupId]/calendar`,
+							// 	params: { groupId },
+							// })}
+							onPress={() => router.back()}
 						>
 							<Feather
 								name="arrow-left"
